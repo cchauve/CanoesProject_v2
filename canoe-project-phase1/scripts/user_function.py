@@ -1,5 +1,6 @@
 import numpy as np
-from scripts.plot_functions_Haruto import plot_canoe import coordinates
+from scripts.plot_functions_Haruto import plot_canoe 
+from scripts.plot_functions_Haruto import coordinates
 
 """
 in order to create a canoe, we will need to get 5 variables
