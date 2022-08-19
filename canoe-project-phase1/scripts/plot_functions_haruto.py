@@ -96,7 +96,8 @@ def plot_canoe(width, height, length, corner_radius, type):
     """
     steps = []
     for i in range(len(fig.data)):
-        step = dict(label="{:.2f}".format(R_selected[i]), args=[{"visible": [False] * len(fig.data)}])
+        step = dict(method="update", label="{:.2f}".format(R_selected[i]), args=[{"visible": [False] * len(fig.data)}])
+        step["args"][0]["visible"][i] = True
         steps.append(step)
 
     sliders = [dict(active=0, currentvalue={"prefix": label}, pad={"t": 50},
