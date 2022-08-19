@@ -78,7 +78,7 @@ def plot_canoe(width, height, length, corner_radius, type):
                 for l in length:
                     for c in corner_radius:
                         """
-                        make the 3D figure for each values in changing variable.
+                        go.Surface() makes the 3D figure for each values in changing variable.
                         """
                         X, Y, Z = coordinates(w, h, l, c, type)
                         fig.add_trace(go.Surface(x=X, y=Y, z=Z, visible=False))
@@ -87,21 +87,18 @@ def plot_canoe(width, height, length, corner_radius, type):
                                 xaxis=dict(range=[min_range, max_range]),
                                 yaxis=dict(range=[min_range, max_range]),
                                 zaxis=dict(range=[min_range, max_range])))
-    
     fig.update_yaxes(scaleanchor = "x", scaleratio = 1)
     fig.data[0].visible = True
-
-    """
-    make a slider for the changing variable
-    """
     steps = []
     for i in range(len(fig.data)):
-        step = dict(method="update", label="{:.2f}".format(R_selected[i]), args=[{"visible": [False] * len(fig.data)}])
+        step = dict(method="update", label="{:.2f}".format(R_selected[i]),
+            args=[{"visible": [False] * len(fig.data)}])
         step["args"][0]["visible"][i] = True
         steps.append(step)
 
-    sliders = [dict(active=0, currentvalue={"prefix": label}, pad={"t": 50},
-    steps=steps)]
+    sliders = [dict(active=0, currentvalue={"prefix": label}, pad={"t": 50}, steps=steps)]
 
     fig.update_layout(sliders=sliders)
     return fig
+temp=plot_canoe([1.0, 1.1, 1.2, 1.3, 1.4], [1], [3], [0], 1)
+temp.show()
