@@ -138,5 +138,5 @@ def plot_canoe(width, height, length, corner_radius, type):
             fig.data[0].y=Y
             fig.data[0].z=Z
         return fig
-#example for width changing only
+#example of function
 temp=plot_canoe([1, 4], [1, 2], [3, 5], [0, 1], 1)
