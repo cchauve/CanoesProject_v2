@@ -46,7 +46,7 @@ def z_coordinates(h, c, a, b, type):
         return h*np.abs(np.sin(a))*np.cos(b)
     else:
         return h*np.abs(np.sin(a))*np.abs(np.cos(b))**(c/(h*np.abs(np.sin(a))))*np.sign(np.cos(b))
-    
+
 def get_eta_theta(type):
     """
     input: canoe type
@@ -82,7 +82,7 @@ def check(width, height, length, corner_radius, type):
         print("there is no such canoe type")
         return 1
     return 0
-    
+
 def plot_canoe(width, height, length, corner_radius, type):
     """
     make a 3D figure of a canoe. 
@@ -125,16 +125,3 @@ def plot_canoe(width, height, length, corner_radius, type):
             fig.data[0].y=Y
             fig.data[0].z=Z
         return fig
-    
-#example of function
-type=int(input("canoe type is: "))
-min_width, max_width=input("width range is: ").split()
-width=[float(min_width), float(max_width)]
-min_height, max_height=input("height range is: ").split()
-height=[float(min_height), float(max_height)]
-min_length, max_length=input("length range is: ").split()
-length=[float(min_length), float(max_length)]
-min_corner_radius, max_corner_radius=input("corner radius range is: ").split()
-corner_radius=[float(min_corner_radius), float(max_corner_radius)]
-
-plot_canoe(width, height, length, corner_radius, 1)
