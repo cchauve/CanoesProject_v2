@@ -127,7 +127,6 @@ def plot_canoe(width, height, length, corner_radius, type):
         return fig
     
 #example of function
-#example of function
 type=int(input("canoe type is: "))
 min_width, max_width=input("width range is: ").split()
 width=[float(min_width), float(max_width)]
