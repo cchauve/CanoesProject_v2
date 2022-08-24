@@ -125,5 +125,17 @@ def plot_canoe(width, height, length, corner_radius, type):
             fig.data[0].y=Y
             fig.data[0].z=Z
         return fig
+    
 #example of function
-temp=plot_canoe([1, 4], [1, 2], [3, 5], [0, 1], 1)
+#example of function
+type=int(input("canoe type is: "))
+min_width, max_width=input("width range is: ").split()
+width=[float(min_width), float(max_width)]
+min_height, max_height=input("height range is: ").split()
+height=[float(min_height), float(max_height)]
+min_length, max_length=input("length range is: ").split()
+length=[float(min_length), float(max_length)]
+min_corner_radius, max_corner_radius=input("corner radius range is: ").split()
+corner_radius=[float(min_corner_radius), float(max_corner_radius)]
+
+plot_canoe(width, height, length, corner_radius, 1)
