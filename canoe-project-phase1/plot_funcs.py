@@ -58,31 +58,6 @@ def get_eta_theta(type):
         a, b=np.meshgrid(np.linspace(0.0, 2*np.pi, 50), np.linspace(np.pi/2, (3/2)*np.pi, 50))
     return a, b
 
-def check(width, height, length, corner_radius, type):
-    """
-    checks if the input of plot_canoe() is acceptable, and has no errors.
-    checks if canoe range is too large, canoe range input is not set to 1 decimal place,
-    and if canoe type is 1 or 2 or 3
-    
-    input: all the input of plot_canoe()
-    output: 1 if there was an error, 0 if there was no error
-    """
-    temp=[width, height, length, corner_radius]
-    label=['width', 'height', 'length', 'corner radius']
-    for i in range(4):
-        if temp[i][1]-temp[i][0]>=10:
-            print(label[i], "range is too large and such canoe does not exist. Make the range smaller.")            
-            return 1
-        if (decimal.Decimal(str(temp[i][0]))%decimal.Decimal("0.1")!=0 or
-            decimal.Decimal(str(temp[i][1]))%decimal.Decimal("0.1")!=0):
-            print("input for range should be a multiple of 0.1.", label[i],
-                 "range does not satisfy this")
-            return 1
-    if type<=0 or type>=4:
-        print("there is no such canoe type")
-        return 1
-    return 0
-
 def plot_canoe(width, height, length, corner_radius, type):
     """
     make a 3D figure of a canoe. 
@@ -91,9 +66,6 @@ def plot_canoe(width, height, length, corner_radius, type):
     output: 3D figure of the canoe with 4 sliders for width, height, length, corner radius
     """
 
-    wrong=check(width, height, length, corner_radius, type)
-    if wrong==1:
-        return None
     """
     first, calculate the maximum number used to make the canoe. This will be
     used to define the range of x,y,z axis 
