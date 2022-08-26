@@ -1,3 +1,7 @@
+"""
+Functions to compute the coordinates of a canoe given its parameters and visualize a canoe
+"""
+
 import numpy as np
 import plotly.graph_objs as go
 import ipywidgets as widgets
