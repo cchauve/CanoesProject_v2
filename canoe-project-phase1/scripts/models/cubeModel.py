@@ -6,12 +6,12 @@ GLOBAL_Gravity      = 9.80665 #(m/s^2)
 For handling all the inputs and outputs of the simple cube model
 """
 
-def CalcEquilibrium(height, density, waterDensity, gravity):
+def CalcEquilibrium(height, density, waterDensity = GLOBAL_WaterDensity):
     """
     Takes a height, density of object, waterDensity, and gravity to calculate the equilibrium.
     Length and depth of object arent neccesary and get cancelled out.
     """
-    return height*density*gravity / waterDensity
+    return height*density / waterDensity
     
 def CalcBouyancy(length, depth, height, waterLevel, waterDensity = GLOBAL_WaterDensity, gravity = GLOBAL_Gravity):
     """
@@ -19,9 +19,8 @@ def CalcBouyancy(length, depth, height, waterLevel, waterDensity = GLOBAL_WaterD
     WaterDensity and gravity have a constant global value unless told otherwise. Still trying to find 
     a nice way around it.
     """
-    
     #max and min to clamp waterLevel to be no less than 0, and no bigger than height. 
-    return max(min(height, waterLevel), 0) * depth * length * waterDensity * gravity
+    return min(max(waterLevel,0), height) * depth * length * waterDensity * gravity
 
 def CalcWeight(length, depth, height, density, gravity = GLOBAL_Gravity):
     """
@@ -78,42 +77,3 @@ def GetCubeTrace(length, height, waterLevel):
                     y = Y,
                 )
     return traceCube
-
-def GetSliders(steps, resolution, prefixText):
-    """
-    Sets up the slider ui, inserts what the steps look like, the resolution (how many steps)
-    Aswell as some prefix text for the slider.
-    """
-    sliderList = [dict(
-        active = int(resolution/2),
-        currentvalue = {"prefix":  prefixText},
-        pad = {"t": resolution},
-        steps = steps,
-    )]
-    
-    return sliderList
-
-def GenerateSteps(length, depth, height, density, N, TitleText):
-    """
-    What each slice of the slider will look like, as well as what the title will look like
-    Takes in a length, depth, height, and density to calculate force total.
-    Height is disjoint, and preset need to fix for the future.
-    """
-    steps = []
-    for i in range(0, N, 2):
-        waterLevel = i/2 * height/(N/2 - 1)
-        waterLevelStr = "{:.4f}".format(waterLevel)
-        
-        buoyancyForce = CalcBouyancy(length, depth, height, waterLevel)
-        weightForce = CalcWeight(length, depth, height, density)
-        totalForce = "{:.4f}".format(buoyancyForce - weightForce)
-        
-        step = dict(
-            method = "update",
-            args = [{"visible": [False]*N},
-                    {"title": TitleText[0] + waterLevelStr + TitleText[1] + totalForce}],
-        )
-        step["args"][0]["visible"][i  ] = True
-        step["args"][0]["visible"][i+1] = True
-        steps.append(step)
-    return steps
