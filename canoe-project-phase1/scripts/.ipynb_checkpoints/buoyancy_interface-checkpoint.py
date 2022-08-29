@@ -1,9 +1,7 @@
 """
 A script mainly for setting up the interface of each graphing model,
 everything should be in one function (as this script will be bulky enough)
-Any method these scripts use should be outsourced to a seperate python file to their respective file, unless its small and meaningfull.
-
-WILL SWITCH TO WHAT HARUTO IS USING IN THE FUTURE
+Any method these scripts use should be outsourced to seperate python files, unless its small and meaningfull addition.
 """
 import plotly.graph_objects as go
 import numpy as np
@@ -13,8 +11,9 @@ import decimal
 
 import scripts.models.cubeModel as cm
 import scripts.models.rotatingCubeModel as rcm
-#import scripts.buoyancy_equilibrium as eq #not being used yet
-#import plot_funcs as pf
+import scripts.models.canoeModel as canoe
+import scripts.visualization as vs
+import scripts.buoyancy_equilibrium as eq
 
 GLOBAL_WaterDensity = 997     #(kg / m^3)
 GLOBAL_Gravity      = 9.80665 #(m/s^2)
@@ -116,7 +115,7 @@ def EquilibriumCubeGraph(length = 5, depth = 5, height = 5, resolution = 64):
         return fig
     return None
 
-def RotatedCubeGraph(length = 5, depth = 5, height = 5, density = 0.5,resolution = 32):
+def RotatedCubeGraph(length = 1, depth = 1, height = 1, density = 500, resolution = 32):
     """
     An interactive graph with slider for water level. 
     length, depth, height, density. Rotation will be in degrees (will be converted to radians in script) 
@@ -140,26 +139,59 @@ def RotatedCubeGraph(length = 5, depth = 5, height = 5, density = 0.5,resolution
     fig.data[0].visible = True
     fig.data[1].visible = True
     
-    @interact(theta = (0, np.pi))
+    @interact(theta = (0, np.pi, np.pi/resolution))
     def update(theta):
         with fig.batch_update():
             X_cube, Y_cube, X_water, Y_water = rcm.GetDiagram(length, height, theta)
             fig.data[0].x, fig.data[0].y = X_cube, Y_cube
             fig.data[1].x, fig.data[1].y = X_water, Y_water
+            
+            volume = rcm.GetArea(X_water, Y_water) * depth
+            fig.update_layout(
+                title = "Displaced Water Volume: " + "{:.4f}".format(volume)
+            )
         return fig
     
     return None
 
-def GenerateBoatGraph(width, height, length, c, a, b, type, resolution = 32):
+def GenerateBoatGraph(width, height, length, c, type, resolution = 32):
     """ 
     An interactive graph with a slider for weight. Shows where the equilibrium of the boat is depending on weight, 
     along with a side view of said boat with a line at equilibrium level.
     """
-    #X = pf.x_coordinates(length, a)
-    #Y = pf.y_coordinates(width , c, a, b, type)
-    #Z = pf.z_coordinates(height, c, a, b, type)
+    mass = 100
+    X, Y, Z = canoe.GetXYZ(width, height, length, c, type, resolution = 32)
+    heightNormalArea = eq.GenerateVectorList(X,Y,Z)
+    level = -eq.BinarySearch(heightNormalArea, mass * GLOBAL_Gravity)
     
-    #heightNormal = eq.GenerateVectorList(X,Y,Z)
+    levelTrace = canoe.GetLevelTrace(level, length)
+    sideTrace = canoe.GetSideTrace(height, length, c, type, resolution)
     
+    fig = go.Figure()
+    
+    fig.add_trace(sideTrace)
+    fig.add_trace(levelTrace)
+    
+    fig.data[0].visible = True
+    fig.data[1].visible = True
+    fig.update_layout(
+        showlegend = False,
+        width = 700,
+        height = 500
+    )
+    fig.update_xaxes(range = [-length * 1.2, length * 1.2])
+    fig.update_yaxes(scaleanchor = "x", scaleratio = 1)
+    
+    stepsize = 10000/resolution
+    @interact(mass = (0, 10000, stepsize))
+    def update(mass):
+        with fig.batch_update():
+            level = -eq.BinarySearch(heightNormalArea, mass * GLOBAL_Gravity)
+            fig.data[1].y = [level, level]
+            
+            fig.update_layout(
+                title = "Water level: " + "{:.4f}".format(level)
+            )
+        return fig
     return None
     
