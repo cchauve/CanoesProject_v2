@@ -5,7 +5,7 @@ import numpy as np
 import plotly.graph_objects as go
 from ipywidgets import *
 
-def get_coordinates(w, h, l, c, a, b, canoe_type):
+def get_coordinates(w, h, l, c, eta, theta, canoe_type):
     """
     get the 3D coordinates of the canoe
     input: 4 floating point numbers for width, height, length, and corner radius of the canoe
@@ -15,39 +15,39 @@ def get_coordinates(w, h, l, c, a, b, canoe_type):
     output: list of y-coordinates of the canoe, named Y
     output: list of z-coordinates of the canoe, named Z
     """
-    X=x_coordinates(l, a)
-    Y=y_coordinates(w, c, a, b, canoe_type)
-    Z=z_coordinates(h, c, a, b, canoe_type)
+    X=x_coordinates(l, eta)
+    Y=y_coordinates(w, c, eta, theta, canoe_type)
+    Z=z_coordinates(h, c, eta, theta, canoe_type)
     return X, Y, Z
 
-def x_coordinates(l, a):
+def x_coordinates(l, eta):
     """
     input: length of canoe, and eta
     output: list of x-coordinates of the canoe
     """
-    return l*np.cos(a)
+    return l*np.cos(eta)
 
-def y_coordinates(w, c, a, b, canoe_type):
+def y_coordinates(w, c, eta, theta, canoe_type):
     """
     input: width of canoe, corner radius of canoe, eta, theta, and canoe type
     output: list of y-coordinates of the canoe
     """
     if canoe_type==3:
-        return w*np.sin(a)*np.abs(np.sin(b))**(c/(w*np.sin(a)))*np.sign(np.sin(b))
+        return w*np.sin(eta)*np.abs(np.sin(theta))**(c/(w*np.sin(eta)))*np.sign(np.sin(theta))
     else:
-        return w*np.sin(a)*np.sin(b)
+        return w*np.sin(eta)*np.sin(theta)
 
-def z_coordinates(h, c, a, b, canoe_type):
+def z_coordinates(h, c, eta, theta, canoe_type):
     """
-    input: height of canoe, corner radius of canoe, eta, theta, canoe type
+    input: height of canoe, corner radius of canoe, eta, theta, and canoe type
     output: list of z-coordinates of the canoe
     """
     if canoe_type==1:
-        return h*np.cos(b)
+        return h*np.cos(theta)
     if canoe_type==2:
-        return h*np.abs(np.sin(a))*np.cos(b)
+        return h*np.abs(np.sin(eta))*np.cos(theta)
     else:
-        return h*np.abs(np.sin(a))*np.abs(np.cos(b))**(c/(h*np.abs(np.sin(a))))*np.sign(np.cos(b))
+        return h*np.abs(np.sin(eta))*np.abs(np.cos(theta))**(c/(h*np.abs(np.sin(eta))))*np.sign(np.cos(theta))
     
 def get_eta_theta(canoe_type):
     """
@@ -66,24 +66,24 @@ def plot_canoe(width, height, length, corner_radius, canoe_type):
     input: 1 integer for canoe type
     input: 4 lists of floating point numbers showing ranges of width, 
         ranges of height, ranges of length, and ranges of corner radius for the canoe
-    output: 3D figure of the canoe with 4 sliders for width, height, length, corner radius
+    output: 3D figure of the canoe with 4 sliders for width, height, length, and corner radius
     """
 
     eta, theta=get_eta_theta(canoe_type)
     X, Y, Z=get_coordinates(width[0], height[0], length[0], corner_radius[0], eta, theta, canoe_type)
     fig=go.Figure()
-    fig.add_trace(go.Surface(x=X, y=Y, z=Z, visible=False))
+    fig.add_trace(go.Surface(x=X, y=Y, z=Z, visible=False, showscale=False))
     """
     make the title, define range of x,y,z axis, define name of x,y,z axis,
-    bound y-axis by x-axis, make sure that figure of canoe always show up in the center
+    bound y-axis by x-axis, and make sure that figure of canoe always show up in the center
     """
     max_range=max(width[1], height[1], length[1])
     min_range=(-max_range)
     fig.layout=go.Layout(title='Type '+str(canoe_type)+' canoe visualization',
         scene=dict(
-        xaxis=dict(range=[min_range, max_range]), xaxis_title='Length(m)',
-        yaxis=dict(range=[min_range, max_range]), yaxis_title='Width(m)',
-        zaxis=dict(range=[min_range, max_range]), zaxis_title='Height(m)'))
+        xaxis=dict(range=[-length[1], length[1]]), xaxis_title='Length(m)',
+        yaxis=dict(range=[-width[1], width[1]]), yaxis_title='Width(m)',
+        zaxis=dict(range=[-height[1], 1]), zaxis_title='Height(m)'))
     fig.update_yaxes(scaleanchor="x", scaleratio=1)
     fig.data[0].visible=True
     """
