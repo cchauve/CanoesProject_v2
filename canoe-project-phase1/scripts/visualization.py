@@ -84,7 +84,7 @@ def plot_canoe(width, height, length, corner_radius, canoe_type):
         xaxis=dict(range=[-length[1], length[1]]), xaxis_title='Length(m)',
         yaxis=dict(range=[-width[1], width[1]]), yaxis_title='Width(m)',
         zaxis=dict(range=[-height[1], 1]), zaxis_title='Height(m)'))
-    fig.update_yaxes(scaleanchor="x", scaleratio=1)
+    fig.update_yaxes(scaleanchor='x', scaleratio=1)
     fig.data[0].visible=True
     """
     make a slider for width, height, length, and corner radius. Each slider slides by 0.1. 
