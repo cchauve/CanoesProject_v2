@@ -13,7 +13,8 @@ Best use is to get your X Y Z lists then call
 EquilibriumSearch(X, Y, Z, weight, binarySearchMax = 16)
 Put in the weight (in Newtons, mass times gravity) of your canoe then it will output the equilibrium level in terms of depth (distance from surface)
 """
-from numpy import sqrt
+#from numpy import sqrt
+from math import sqrt, isnan
 GLOBAL_WaterDensity = 997 #(kg / m^3)
 GLOBAL_Gravity      = 9.80665 #(m/s^2)
 
@@ -121,7 +122,14 @@ def CalculateForce(heightNormalArea, depthLevel):
     force = 0
     
     for i in range(0, N):
-        force += (heightNormalArea[i][1] * RemapPressure(-1*heightNormalArea[i][0], depthLevel)) * heightNormalArea[i][2] #( kg/(m*s^2) ) * delta(m^2)
+        newForce = (heightNormalArea[i][1] * RemapPressure(-1*heightNormalArea[i][0], depthLevel)) * heightNormalArea[i][2]
+        if (not isnan(newForce)): 
+            force += newForce #( kg/(m*s^2) ) * delta(m^2)
+            #print(i)
+            #print(heightNormalArea[i])
+
+            
+
     return force #kg * m / s^2
 
 
@@ -134,6 +142,10 @@ def BinarySearch(heightNormalArea, weight, binarySearchMax = 16):
     searchMax, searchMin  = GetMinMaxHeight(heightNormalArea) #reverse order so it would be in depth form.
     searchMin *= -1
     searchMax *= -1
+    
+    searchDistance = abs(searchMax - searchMin)
+    searchMin -= searchDistance * 0.1
+    searchMax += searchDistance * 0.1
     
     # ---searchMin ---
     #       |

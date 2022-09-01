@@ -37,7 +37,7 @@ def GetWaterDiagram(length, waterLevel):
     """
     The polygon line drawing of what the box looks like
     """
-    X = [-length, 2*length, None, 0,  0         ,  length    , length]
+    X = [-10*length, 10*length, None, 0,  0         ,  length    , length]
     Y = [ 0     , 0       , None, 0, -waterLevel, -waterLevel, 0     ]
     return X, Y
 
@@ -59,6 +59,7 @@ def GetWaterTrace(length, waterLevel):
         visible = False,
         line = dict(color = "#1991df", width = 3),
         name = "w = " + str(waterLevel),
+        mode = "lines",
         x = X,
         y = Y
     )
@@ -73,6 +74,7 @@ def GetCubeTrace(length, height, waterLevel):
                     visible = False,
                     line = dict(color = "#141414", width = 3),
                     name = "v = " + str(waterLevel),
+                    mode = "lines",
                     x = X, 
                     y = Y,
                 )

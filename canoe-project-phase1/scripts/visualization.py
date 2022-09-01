@@ -33,7 +33,7 @@ def y_coordinates(w, c, eta, theta, canoe_type):
     output: list of y-coordinates of the canoe
     """
     if canoe_type==3:
-        return w*np.sin(eta)*np.abs(np.sin(theta))**(c/(w*np.sin(eta)))*np.sign(np.sin(theta))
+        return w*np.sin(eta)*np.abs(np.sin(theta))**(c/(w*np.sin(eta)))*np.sign(np.sin(theta)) 
     else:
         return w*np.sin(eta)*np.sin(theta)
 
@@ -56,8 +56,14 @@ def get_eta_theta(canoe_type):
     """
     if canoe_type==3:
         a, b=np.meshgrid(np.linspace(0.01, np.pi-0.01, 50), np.linspace(np.pi/2, (3/2)*np.pi, 50))
+    if canoe_type==2:
+        #originally was 0 to 2 np.pi, however this causes double faces. It was originally for covering up a bit of floating point error
+        #However having double the geometry lead to several other bugs, as well as ruining calculations in another notebook
+        a, b=np.meshgrid(np.linspace(0.0, np.pi, 50, endpoint = True), np.linspace(np.pi/2, (3/2)*np.pi, 50))
     else:
-        a, b=np.meshgrid(np.linspace(0.0, 2*np.pi, 50), np.linspace(np.pi/2, (3/2)*np.pi, 50))
+        #originally was 0 to 2 np.pi, however this causes double faces. It was originally for covering up a bit of floating point error
+        #However having double the geometry lead to several other bugs, as well as ruining calculations in another notebook
+        a, b=np.meshgrid(np.linspace(0.0, np.pi, 50, endpoint = True), np.linspace(np.pi/2, (3/2)*np.pi, 50, endpoint = True))
     return a, b
 
 def plot_canoe(width, height, length, corner_radius, canoe_type):

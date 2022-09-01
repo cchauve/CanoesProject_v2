@@ -4,11 +4,11 @@ import scripts.visualization as vs
 GLOBAL_WaterDensity = 997     #(kg / m^3)
 GLOBAL_Gravity      = 9.80665 #(m/s^2)
 
-def GetSideTrace(height, length, c, type, resolution):
+def GetSideTrace(height, length, c, canoe_type, resolution):
     """
     Gets the side profile of our canoe and returns the scatter plot trace of it
     """
-    X_side, Z_side = GetSideData(height, length, c, type, resolution)
+    X_side, Z_side = GetSideData(height, length, c, canoe_type, resolution)
     sideTrace = go.Scatter(
         visible = False,
         line = dict(color = "#141414", width = 3),
@@ -17,29 +17,35 @@ def GetSideTrace(height, length, c, type, resolution):
     )
     return sideTrace
 
-def GetSideData(height, length, c, type, resolution):
+def GetSideData(height, length, c, canoe_type, resolution):
     """
     Gets the data of the side trace.
     """
-    if type==3:
-        a, b = np.linspace(0.01, np.pi-0.01, resolution), np.linspace(np.pi/2, (3/2)*np.pi, resolution)
+    X_side, Y_side, Z_side = GetXYZ(1, height, length, c, canoe_type, resolution)
+        
+    X = [0]*resolution
+    Z = [0]*resolution
+    
+    if (canoe_type == 1):
+        for i in range(0, resolution):
+            X[i] = X_side[int(resolution/2)][i]
+            Z[i] = Z_side[i][int(resolution/2)]
     else:
-        a, b = np.linspace(0.0, 2*np.pi, resolution), np.linspace(np.pi/2, (3/2)*np.pi, resolution)
+        for i in range(0, resolution):
+            X[i] = X_side[int(resolution/2)][i]
+            Z[i] = Z_side[int(resolution/2)][i]
     
-    X_side = vs.x_coordinates(length, a)
-    Z_side = vs.z_coordinates(height, c, a, b, type)
+    return X, Z
     
-    return X_side, Z_side
-
-def GetXYZ(width, height, length, c, type, resolution = 32):
+def GetXYZ(width, height, length, c, canoe_type, resolution = 32):
     """
     Gets the Surface of our canoe, in X,Y,Z form
     """
-    a, b = vs.get_eta_theta(type)
+    a, b = vs.get_eta_theta(canoe_type)
     
     X = vs.x_coordinates(length, a)
-    Y = vs.y_coordinates(width , c, a, b, type)
-    Z = vs.z_coordinates(height, c, a, b, type)
+    Y = vs.y_coordinates(width , c, a, b, canoe_type)
+    Z = vs.z_coordinates(height, c, a, b, canoe_type)
     return X, Y, Z
 
 def GetLevelTrace(level, length):
@@ -53,3 +59,4 @@ def GetLevelTrace(level, length):
         y = [level, level]
     )
     return sideTrace
+
