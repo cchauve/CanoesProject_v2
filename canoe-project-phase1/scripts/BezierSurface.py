@@ -28,7 +28,8 @@ def GetSurface(p, u, v, n):
     U = np.array(u)
     V = np.array(v)
     columns = len(P[0])-1 #columns of P
-    rows = len(P)-1    #ros of P,
+    rows = len(P)-1       #ros of P,
+    
     #adding one for the included endpoint, all numbers repeat mod 1, we sample our t points from this instead of calculating them
     T = np.linspace(0, 1, n+1, endpoint = True)
     
@@ -59,15 +60,13 @@ def GetSurface(p, u, v, n):
         for j in range(0, columns):
             #for each tile, generate the grid in it.
             #using the top and bottom generated points, and the 
-            #interpolated handles, genearte the grid inbetween. 
+            #interpolated handles, it generates the grid inbetween. 
             
             B_ha = V[i][j]   
             B_hb = V[i][j]   + U[i][j]
             B_hc = V[i][j+1] - U[i][j+1] #negative U[i][j+1] to orientate properly for interpolation
             B_hd = V[i][j+1]
 
-            #negative V[i+1] to orientate properly for interpolation
-            #originally -V and + Bcurve
             C_ha = V[i+1][j]
             C_hb = V[i+1][j]   + U[i+1][j]
             C_hc = V[i+1][j+1] - U[i+1][j+1]
@@ -79,11 +78,7 @@ def GetSurface(p, u, v, n):
                 
                 B = A + Lerp(B_ha, B_hd, T[t])  
                 C = D - Lerp(C_ha, C_hd, T[t])
-                for s in range(1, n): #1, n = len(T)-1 cause top and bottom already generated 
-                    #B = A + BCurve(B_ha, B_hb, B_hc, B_hd, T[s])  
-                    #C = D - BCurve(C_ha, C_hb, C_hc, C_hd, T[s])
-                    
-                    
+                for s in range(1, n): #(1, n = len(T)-1) because top and bottom already generated 
                     point = BCurve(A, B, C, D, T[s])
                     
                     XX[i*n+s][j*n+t] = point[0]
@@ -92,14 +87,26 @@ def GetSurface(p, u, v, n):
               
     return XX, YY, ZZ
     
-#Bezier Curve 
+
+"""
+Takes in points A,B,C,D
+and a interpolation value t in [0,1] range.
+
+Outputs a point in the same dimension
+"""
 def BCurve(A,B,C,D, t):
+    
     A0 = np.multiply(A, -1*t**3 + 3*t**2 - 3*t + 1)
     B0 = np.multiply(B,  3*t**3 - 6*t**2 + 3*t)
     C0 = np.multiply(C, -3*t**3 + 3*t**2)
     D0 = np.multiply(D,  1*t**3)
     return A0 + B0 + C0 + D0 #arrays can add onto eachother nicely.
+"""
+A linear interpolation between A and B
+using the interpolation value t in [0,1] range.
 
+Outputs a point in the same dimension
+"""
 def Lerp(A, B, t):
     A0 = np.multiply(A, -t + 1)
     B0 = np.multiply(B,  t)

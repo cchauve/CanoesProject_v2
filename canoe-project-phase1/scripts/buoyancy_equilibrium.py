@@ -71,11 +71,14 @@ def GenerateVectorList(X, Y, Z):
     where i and j incremints form our surface (X[i][j], Y[i][j], Z[i][j])
     all inputs should have the same size (we can adjust in the future for more adjustability)
     """
-    N = len(X)
+    N = len(X)   #number of rows    X[N][ ]
+    M = len(X[1])#number of columns X[ ][M]
+    
     area = 0; #To divide by when calulcating force.
     heightNormalArea = [[0] * 3  for i in range((N-1)**2)]; #[z position, z normal]
+    listPos = 0
     for i in range(0, N-1):
-        for j in range(0, N-1):
+        for j in range(0, M-1):
             # A ---- B
             # | \    |
             # |  \   |
@@ -92,9 +95,11 @@ def GenerateVectorList(X, Y, Z):
             #adding the two trapezoids and dividing by 2 is the same as adding the two triangles together
             deltaArea = (sqrt(n1[0]**2 + n1[1]**2 + n1[2]**2) + sqrt(n2[0]**2 + n2[1]**2 + n2[2]**2))/2.0
            
-            heightNormalArea[i*(N-1) + j][0] = (A[2] + B[2] + C[2] + D[2]) /4.0  #Z position of the center ABCD 
-            heightNormalArea[i*(N-1) + j][1] = ((n1[2] + n2[2])/2.0) / deltaArea #Normalize the normals (save the z direction)
-            heightNormalArea[i*(N-1) + j][2] = deltaArea
+            heightNormalArea[listPos][0] = (A[2] + B[2] + C[2] + D[2]) /4.0  #Z position of the center ABCD 
+            heightNormalArea[listPos][1] = ((n1[2] + n2[2])/2.0) / deltaArea #Normalize the normals (save the z direction)
+            heightNormalArea[listPos][2] = deltaArea
+            
+            listPos = listPos + 1
             
             
     return heightNormalArea
@@ -133,12 +138,15 @@ def CalculateForce(heightNormalArea, depthLevel):
     return force #kg * m / s^2
 
 
-def BinarySearch(heightNormalArea, weight, binarySearchMax = 16):
+def BinarySearch(heightNormalArea, weight, binarySearchMax = 16, symmetryMultiplier = 1):
     """returns the equilibrium depth (m)
     takes the heightNormal list [depth, z_normal, area], surface area, a defined weight, and how deep in the binary search to look
-
+    Also a symmetry if you only put in a symmetric half, quarter, etc of your object into the search
+    
     Performs a binary search to find the equilibrium depth dependent on the weight
     """
+   
+    
     searchMax, searchMin  = GetMinMaxHeight(heightNormalArea) #reverse order so it would be in depth form.
     searchMin *= -1
     searchMax *= -1
@@ -157,7 +165,7 @@ def BinarySearch(heightNormalArea, weight, binarySearchMax = 16):
     
     for d in range(0, binarySearchMax):
         searchLevel = (searchMax + searchMin)/2.0
-        force = CalculateForce(heightNormalArea, searchLevel)
+        force = CalculateForce(heightNormalArea, searchLevel) * symmetryMultiplier
         
         #Pascals to Newtons, based on area
        #kg/(m* s^2) * m^2 = kg m/ s^2 = (N)
@@ -178,14 +186,16 @@ def BinarySearch(heightNormalArea, weight, binarySearchMax = 16):
     return searchLevel
 
 
-def EquilibriumSearch(X, Y, Z, weight, binarySearchMax = 16):
+def EquilibriumSearch(X, Y, Z, weight, binarySearchMax = 16, symmetryMultiplier = 1):
     """returns the equilibrium depth.
 
     Like binary search but takes the X, Y, Z array of points defining the boat, 
     a defined weight, and binary search limit.
     Calculates the heightNormal list [depth, z_normal] and surface area.
+    Also a symmetry if you only put in a symmetric half, quarter, etc of your object into the search
+    
     Mainly for condensing the amount of code needed in the final notebook (possibly)
     """
     heightNormalArea = GenerateVectorList(X, Y, Z) 
     
-    return BinarySearch(heightNormalArea, weight, binarySearchMax)
+    return BinarySearch(heightNormalArea, weight, binarySearchMax, symmetryMultiplier = 1)

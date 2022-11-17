@@ -26,15 +26,43 @@ def CubeGraph():
     set up sliders, labels, and ui position. As well as calling the the method to display everything
     """
     stepSize = 0.05
-    length = widgets.FloatSlider(min = 0.01, max = 2, step = stepSize, value = 1, description = "length (m): ", continuous_update = False)
-    width  = widgets.FloatSlider(min = 0.01, max = 2, step = stepSize, value = 1, description = "width (m): ", continuous_update = False)
-    height = widgets.FloatSlider(min = 0.01, max = 2, step = stepSize, value = 1, description = "height (m): ", continuous_update = False)
+    length = widgets.FloatSlider(min = 0.01, 
+                                 max = 2, 
+                                 step = stepSize, 
+                                 value = 1, 
+                                 description = "length (m): ", 
+                                 continuous_update = False)
     
-    density = widgets.FloatSlider(min = 0.1, max = GLOBAL_WaterDensity * 1.05, value = 750 , step = stepSize, description = "density: ", continuous_update = False)
+    width  = widgets.FloatSlider(min = 0.01, 
+                                 max = 2, 
+                                 step = stepSize, 
+                                 value = 1, 
+                                 description = "width (m): ", 
+                                 continuous_update = False)
+    
+    height = widgets.FloatSlider(min = 0.01, 
+                                 max = 2, 
+                                 step = stepSize, 
+                                 value = 1, 
+                                 description = "height (m): ", 
+                                 continuous_update = False)
+    
+    density = widgets.FloatSlider(min = 0.1, 
+                                  max = GLOBAL_WaterDensity * 1.05, 
+                                  value = 750 , 
+                                  step = stepSize, 
+                                  description = "density: ", 
+                                  continuous_update = False)
+    
     density.style.handle_color = "#141414"
     
     ui = widgets.TwoByTwoLayout(top_left = length, top_right = width, bottom_left = height, bottom_right = density)
-    out = widgets.interactive_output(WaterLevelCubeGraph, {"length": length, "width": width, "height": height, "density": density, "resolution": fixed(64)})
+    out = widgets.interactive_output(WaterLevelCubeGraph, 
+                                     {"length": length, 
+                                      "width": width, 
+                                      "height": height, 
+                                      "density": density, 
+                                      "resolution": fixed(64)})
     display(ui, out)
 
 def CanoeGraph():
@@ -44,11 +72,35 @@ def CanoeGraph():
     """
     stepSize = 0.05
     
-    length = widgets.FloatSlider(min = 0.01, max = 5, step = stepSize, value = 4  , description = "length (m)", continuous_update = False)
-    width  = widgets.FloatSlider(min = 0.01, max = 1.5, step = stepSize, value = 0.5, description = "width (m)" , continuous_update = False)
-    height = widgets.FloatSlider(min = 0.01, max = 1.5, step = stepSize, value = 0.5  , description = "height (m)", continuous_update = False)
+    length = widgets.FloatSlider(min = 0.01, 
+                                 max = 5, 
+                                 step = stepSize, 
+                                 value = 4, 
+                                 description = "length (m)", 
+                                 continuous_update = False)
+    
+    width  = widgets.FloatSlider(min = 0.01, 
+                                 max = 1.5, 
+                                 step = stepSize, 
+                                 value = 0.5, 
+                                 description = "width (m)", 
+                                 continuous_update = False)
+    
+    height = widgets.FloatSlider(min = 0.01, 
+                                 max = 1.5, 
+                                 step = stepSize, 
+                                 value = 0.5, 
+                                 description = "height (m)", 
+                                 continuous_update = False)
 
-    curveDef = widgets.FloatSlider(min = 0.01, max = 2, step = stepSize, value = 0.5, description = "curve definition", continuous_update = False, orientation = "vertical")
+    curveDef = widgets.FloatSlider(min = 0.01, 
+                                   max = 2, 
+                                   step = stepSize, 
+                                   value = 0.5, 
+                                   description = "curve definition", 
+                                   continuous_update = False, 
+                                   orientation = "vertical")
+    
     canoeType = widgets.IntSlider(min = 1, max = 3, description = "Canoe Type", layout=widgets.Layout(width='85%'))
 
     ui = widgets.GridspecLayout(4, 2, width = "50%", height = "275px")
