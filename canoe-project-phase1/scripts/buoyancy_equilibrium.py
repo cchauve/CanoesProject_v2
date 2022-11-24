@@ -31,10 +31,7 @@ def Cross(A , B, C):
     x =  U[1]*V[2] - U[2]*V[1]
     y = -U[0]*V[2] + U[2]*V[0]
     z =  U[0]*V[1] - U[1]*V[0]
-    
-
     #Mathematically the cross product already has the trapezoids area of the trapezoid defined by UV 
-    
     return [x,y,z]
 
 
@@ -72,10 +69,10 @@ def GenerateVectorList(X, Y, Z):
     all inputs should have the same size (we can adjust in the future for more adjustability)
     """
     N = len(X)   #number of rows    X[N][ ]
-    M = len(X[1])#number of columns X[ ][M]
+    M = len(X[0])#number of columns X[ ][M]
     
     area = 0; #To divide by when calulcating force.
-    heightNormalArea = [[0] * 3  for i in range((N-1)**2)]; #[z position, z normal]
+    heightNormalArea = [[0] * 3  for i in range((N-1)*(M-1))]; #[z position, z normal]
     listPos = 0
     for i in range(0, N-1):
         for j in range(0, M-1):
@@ -99,44 +96,24 @@ def GenerateVectorList(X, Y, Z):
             heightNormalArea[listPos][1] = ((n1[2] + n2[2])/2.0) / deltaArea #Normalize the normals (save the z direction)
             heightNormalArea[listPos][2] = deltaArea
             
-            listPos = listPos + 1
-            
-            
+            listPos = listPos + 1 #order doesnt matter for the list   
     return heightNormalArea
 
 
-def RemapPressure(depth, startDepth):
-    """returns the depth pressure pascals (kg/(m * s^2))
-    Takes a depth value and startDepth where the water level starts. 
-    """
-    remappedDepth = max(depth - startDepth, 0) #clamps so only values greater than zero are calculated
-    #if (remappedDepth < 0) remappedDepth = 0 
-    #Hydro static pressure = fluid density(kg / m^3) * gravity(m/s^2) * fluid depth(m)
-    return GLOBAL_WaterDensity * GLOBAL_Gravity * remappedDepth #(kg / m * s^2)
-
-
-def CalculateForce(heightNormalArea, depthLevel):
+def CalculateForce(heightNormalArea, waterLevel):
     """returns the total Force over all heightNormalArea points, (kg * m/ s^2)
-    Takes the HNA list [depth, z_normal, area], and a depthLevel where the water starts
-
-    We do need to convert our z positions into a depth range which should be positive the deeper you. 
-    Maybe in the future unify it all to avoid these conversions
+    Takes the HNA list [depth, z_normal, area], and a waterLevel where the water starts (anything below is underwater)
     """
-    
     N = len(heightNormalArea); 
     force = 0
+    RemapPressure = lambda a: max(waterLevel - a,0) * GLOBAL_WaterDensity * GLOBAL_Gravity
     
     for i in range(0, N):
-        newForce = (heightNormalArea[i][1] * RemapPressure(-1*heightNormalArea[i][0], depthLevel)) * heightNormalArea[i][2]
+        newForce = -heightNormalArea[i][1] * RemapPressure(heightNormalArea[i][0]) * heightNormalArea[i][2]
         if (not isnan(newForce)): 
             force += newForce #( kg/(m*s^2) ) * delta(m^2)
-            #print(i)
-            #print(heightNormalArea[i])
-
-            
 
     return force #kg * m / s^2
-
 
 def BinarySearch(heightNormalArea, weight, binarySearchMax = 16, symmetryMultiplier = 1):
     """returns the equilibrium depth (m)
@@ -145,44 +122,39 @@ def BinarySearch(heightNormalArea, weight, binarySearchMax = 16, symmetryMultipl
     
     Performs a binary search to find the equilibrium depth dependent on the weight
     """
-   
-    
-    searchMax, searchMin  = GetMinMaxHeight(heightNormalArea) #reverse order so it would be in depth form.
-    searchMin *= -1
-    searchMax *= -1
+    searchMax, searchMin = GetMinMaxHeight(heightNormalArea) #reverse order so it would be in depth form.
     
     searchDistance = abs(searchMax - searchMin)
     searchMin -= searchDistance * 0.1
     searchMax += searchDistance * 0.1
     
-    # ---searchMin ---
+    # ---searchMax ---
     #       |
     #       |
     #  searchLevel
     #       |
     #       |
-    #---searchMax ---
-    
+    #---searchMin ---
     for d in range(0, binarySearchMax):
         searchLevel = (searchMax + searchMin)/2.0
         force = CalculateForce(heightNormalArea, searchLevel) * symmetryMultiplier
-        
         #Pascals to Newtons, based on area
-       #kg/(m* s^2) * m^2 = kg m/ s^2 = (N)
+        #kg/(m* s^2) * m^2 = kg m/ s^2 = (N)
         
         if (force == weight):
             return searchLevel
         
-        #the force of water is greater than our boats weight, float level must have less depth
-        #should lower the force
-        if (force > weight): 
-            searchMin = searchLevel
-            
-        #the force of water is less than our boats weight, float level must have more depth
-        #should raise the force
-        if (force < weight):
+        #something is wonky with the math below, need to investigate however this is working.
+        #the force of water is less than our boats weight
+        #Clearly we can raise the water level and search higher
+        if (force < weight): 
             searchMax = searchLevel
             
+        #the force of water is more than our boats weight
+        #Clearly we can lower the water level and search lower
+        if (force > weight):
+            searchMin = searchLevel
+                 
     return searchLevel
 
 

@@ -36,11 +36,6 @@ def Canoe():
                               value = 1,
                               description = "Canoe type: ")
     
-    #ui = widgets.HBox([length, width, height, name])
-    #out = widgets.interactive_output(CanoeGraph, {"length": length, "width": width, "height": height, "name": name})
-    
-    #display(ui, out)
-    
     widgets.interact_manual(CanoeGraph, length = widgetLength, width = widgetWidth, height = widgetHeight, name   = widgetNames)
     
 

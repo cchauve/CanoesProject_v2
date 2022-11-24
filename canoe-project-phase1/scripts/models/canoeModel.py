@@ -13,7 +13,13 @@ def GetCanoe(length, width, height, canoe_type, resolution):
 
 
 def GetCanoeNootkan(length, width, height):
-    "Nootkan Style Canoe"
+    """
+    Nootkan Style Canoe
+    Takes a length, width, height (floats)
+    
+    returns the P, U, V arrays for the bs.GetSurface method
+    """
+    
     a = length - 7.687
     b = width/2 - 0.625
     c = height - 1.135
@@ -47,16 +53,21 @@ def GetCanoeNootkan(length, width, height):
     
 
 def GetCanoeHaida(length, width, height):
-    "Haida Style Canoe"
+    """
+    Haida Style Canoe
+    Takes a length, width, height (floats)
+    
+    returns the P, U, V arrays for the bs.GetSurface method
+    """
     a = length - 6.4268
     b = width/2 - 0.50708
     c = height - 0.84752
     P = [
-        [[0.007417      ,-0.046391 - b/4, 0.77212 + c], [0.050118      , 0, 0.57692 + c/2]],
-        [[1.7351 + a*1/4,-0.47607  - b  , 0.47695 + c], [1.7434 + a*1/4, 0, 0.00738]],
-        [[4.2141 + a*3/4,-0.50708  - b  , 0.48305 + c], [4.2206 + a*3/4, 0, 0.00738]],
-        [[5.2557 + a    ,-0.36251  - b  , 0.61488 + c], [5.26   + a    , 0, 0.16842 + c/4]],
-        [[6.4268 + a    ,-0.054097 - b/4, 0.84752 + c], [6.4406 + a    , 0, 0.63492 + c/2]],
+        [[0.007417      ,-0.046391 - b*0.1, 0.77212 + c], [0.050118      , 0, 0.57692 + c/2]],
+        [[1.7351 + a*0.3,-0.47607  - b*0.9, 0.47695 + c], [1.7434 + a*0.3, 0, 0.00738]],
+        [[4.2141 + a*0.6,-0.50708  - b    , 0.48305 + c], [4.2206 + a*0.6, 0, 0.00738]],
+        [[5.2557 + a*0.8,-0.36251  - b*0.7, 0.61488 + c], [5.26   + a*0.8, 0, 0.16842 + c/4]],
+        [[6.4268 + a    ,-0.054097 - b*0.1, 0.84752 + c], [6.4406 + a    , 0, 0.63492 + c/2]],
         ]
     
     U = [

@@ -129,21 +129,6 @@ def CanoeGraph():
         canoe_type = widgetNames
     )
     
-
-    #ui = widgets.GridspecLayout(4, 2, width = "50%", height = "275px")
-    #ui[0, 0] = length
-    #ui[1, 0] = width
-    #ui[2, 0] = height
-    #ui[3, :] = canoeType
-    
-    #out = widgets.interactive_output(GenerateBoatGraph, 
-    #                                 {"length": length, 
-    #                                  "width": width, 
-    #                                  "height": height, 
-    #                                  "canoe_type": canoeType, 
-    #                                  "resolution": fixed(50)})
-    #display(ui, out)
-
 def figureSetup(traces, width, height, showlegend = False, xRange = None, yRange = None):
     """
     A helper method to condense the figure setup and remove duplicate code
@@ -224,24 +209,22 @@ def GenerateBoatGraph(length, width, height, canoe_type, resolution = 4):
     mass = 100
     symmetry = 2
     
-    X, Y, Z = canoe.GetCanoe(width, height, length, canoe_type, resolution)
-    #arrayDimensions = [len(X), len(X[0])]
-    heightNormalArea = eq.GenerateVectorList(X,Y,Z)
+    XX, YY, ZZ = canoe.GetCanoe(length, width, height, canoe_type, resolution)
+    heightNormalArea = eq.GenerateVectorList(XX,YY,ZZ)
+    maxWeight = abs(eq.CalculateForce(heightNormalArea, height) / GLOBAL_Gravity)
+    stepsize = maxWeight/(64)
     
-    maxWeight = abs(eq.CalculateForce(heightNormalArea, 0)*2 / GLOBAL_Gravity)
-    stepsize = maxWeight/resolution
+    xLine, zLine = getCanoeBorder(XX,ZZ)
     
-    xLine, zLine = getCanoeBorder(X,Z)
-    xRange = [-0.5 * length, 1.5 * length]
-    yRange = [-1.1 * height, 1.1 * height]
     #plot setup
+    xRange = [-0.125 * length, 1.125 * length]
+    yRange = [-1.1 * height, 1.1 * height]
     levelTrace = go.Scatter(
         x = [-0.5*length, 1.5*length], 
         y = [0, 0],
         visible = False,
         line = dict(color = "#1991df", width = 3)
     )
-   
     sideTrace = go.Scatter(
         x = xLine, 
         y = zLine, 
@@ -259,41 +242,51 @@ def GenerateBoatGraph(length, width, height, canoe_type, resolution = 4):
     @interact(mass = massWidget) 
     def update(mass):
         with fig.batch_update():
-            
-            level = eq.BinarySearch(heightNormalArea, mass * GLOBAL_Gravity, symmetryMultiplier = symmetry)
-            fig.data[0].y = np.add(zLine, level)
+            waterLevel = eq.BinarySearch(heightNormalArea, weight = mass * GLOBAL_Gravity ,symmetryMultiplier = symmetry)
+            fig.data[0].y = np.subtract(zLine, waterLevel)
             
             fig.update_layout(
-                title = "Canoe top to water (m): " + "{:.4f}".format(level)
+                title = "water level(m): " + "{:.4f}".format(waterLevel)
             )
         return fig
     return None
 
 def getCanoeBorder(X,Z):
-    arrayDimensions = [len(X), len(X[0])]
-    size = (arrayDimensions[0] + arrayDimensions[1] - 1)*2
-    xLine = [0]*(size)
-    zLine = [0]*(size)
-    for i in range(0, arrayDimensions[0]-1):
-        xLine[i] = X[i][0]
-        zLine[i] = Z[i][0]
-        
-    offset = arrayDimensions[0] - 1
-    for i in range(0, arrayDimensions[1]-1):
-        xLine[i + offset] = X[arrayDimensions[0]-1][i]
-        zLine[i + offset] = Z[arrayDimensions[0]-1][i]
-        
-    offset += arrayDimensions[1] - 1
-    for i in range(0, arrayDimensions[0]-1):
-        xLine[i + offset] = X[arrayDimensions[0]-1-i][arrayDimensions[1]-1]
-        zLine[i + offset] = Z[arrayDimensions[0]-1-i][arrayDimensions[1]-1]
-        
-    offset += arrayDimensions[0]-1
-    for i in range(0, arrayDimensions[1]-1):
-        xLine[i + offset] = X[0][arrayDimensions[1]-1-i]
-        zLine[i + offset] = Z[0][arrayDimensions[1]-1-i]
+    """ Takes in two array grids (same size)
+    returns the border of two array grids in a list, counter clockwise
+    """
+    arrayD = [len(X), len(X[0])]
+    xLine = []
+    zLine = []
+    listInit = lambda a: [[0]*a, [0]*a]
+    arrayGrab = lambda a,b: [X[a][b], Z[a][b]]
+    arrayAppend = lambda a,b: [xLine + a, zLine + b]
     
-    return X,Z
-        
-        
+    x0, z0 = listInit(arrayD[0])
+    x1, z1 = listInit(arrayD[1])
+    
+    index_b = 0
+    for i in range(0, arrayD[0]):
+        index_a = i
+        x0[i], z0[i] = arrayGrab(index_a, index_b)
+    xLine, zLine = arrayAppend(x0, z0)
+    
+    index_a = arrayD[0]-1
+    for i in range(0, arrayD[1]):
+        index_b = i
+        x1[i], z1[i] = arrayGrab(index_a, index_b)
+    xLine, zLine = arrayAppend(x1, z1)
+
+    index_b = arrayD[1]-1
+    for i in range(0, arrayD[0]):
+        index_a = arrayD[0]-1-i
+        x0[i], z0[i] = arrayGrab(index_a, index_b)
+    xLine, zLine = arrayAppend(x0, z0)
+
+    index_a = 0
+    for i in range(0, arrayD[1]):
+        index_b = arrayD[1]-1-i
+        x1[i], z1[i] = arrayGrab(index_a, index_b)
+    xLine, zLine = arrayAppend(x1, z1)
+    return xLine,zLine
     
