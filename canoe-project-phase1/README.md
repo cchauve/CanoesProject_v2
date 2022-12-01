@@ -9,10 +9,10 @@ Users only need to import the Interface Scripts and call<br />
 The interactive graphs are<br />
 <code> bci.CurveGraph() </code>
 
-<code> widgetLength, widgetWidth, widgetHeight, widgetNames = bsi.GetWidgets() <br />
-bsi.Canoe(widgetLength, widgetWidth, widgetHeight, widgetNames) <br />
-bi.CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames)
-</code>
+<code> widgetLength, widgetWidth, widgetHeight, widgetNames = bsi.GetWidgets()</code><br />
+<code>bsi.Canoe(widgetLength, widgetWidth, widgetHeight, widgetNames)</code><br />
+<code>bi.CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames)</code>
+
 
 <code> bi.CubeGraph() </code>
 
