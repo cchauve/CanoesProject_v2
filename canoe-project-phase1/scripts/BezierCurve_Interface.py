@@ -1,25 +1,17 @@
 import plotly.graph_objects as go
-import plotly.express as px
-import numpy as np
+import numpy as np #Might need this later
 import scripts.BezierCurve as bc
 
 from ipywidgets import interact, fixed, interact_manual 
 import ipywidgets as widgets
 from IPython.display import display
-
-def GetCurvePlotWidgets():
-    tStepsize = 1/32
-    stepsize = 5/32
-    tWidget = widgets.FloatSlider(min = 0, max = 1, value = 0.5, step = tStepsize, description = "t")
-    xWidget = widgets.FloatSlider(min = 0, max = 5, value = 0, step = stepsize, readout = False, description = "x")
-    yWidget = widgets.FloatSlider(min = 0, max = 5, value = 0, step = stepsize, readout = False, description = "y")
-    xWidget.style.handle_color = "red"
-    yWidget.style.handle_color = "green"
-    tWidget.style.handle_color = "blue"
-    return xWidget, yWidget, tWidget
     
-def CurvePlot():
-    resolution = 40
+def CurveGraph():
+    """ Displays the 3 point Bezier Curve graph
+    There are also widgets available for the user.
+    """
+    ##DATA PREP WORK
+    resolution = 32
     xPoints = [0, 2.5, 5]
     yPoints = [0, 2.5, 5]
     points  = [[xPoints[0],yPoints[0]],[xPoints[1],yPoints[1]],[xPoints[2],yPoints[2]]]
@@ -34,48 +26,41 @@ def CurvePlot():
     
     xx = [0]*resolution
     yy = [0]*resolution
-
-    for i in range(0, resolution):
-        xx[i], yy[i] = bc.CurvePoint(points, i/(resolution-1))
     
+    ##PLOT CREATION
     pointPlot = go.Scatter(
+        name = "1st Interpolation Line",
         visible = True,
         mode = "markers+lines+text",
         line = dict(color = "#2eb089", width = 3),
         marker = dict(color = "#2eb089", size = 7),
         text = ["P1", "P2", "P3"],
-        textposition = "bottom center",
-        name = "1st Interpolation",
-        x = xPoints,
-        y = yPoints
+        textposition = "bottom center"
     )
     curvePlot = go.Scatter(
+        name = "Bézier Curve",
         visible = True,
         line = dict(color = "#141414", width = 5),
-        mode = "lines",
-        name = "Bézier Curve",
-        x = xx,
-        y = yy
+        mode = "lines"
     )
     interpolatedPlot = go.Scatter(
+        name = "2nd Interpolation Line",
         visible = True,
         line = dict(color = "#20808c", width = 3),
-        marker = dict(color = "#ad2a13", size = 7),
-        mode = "markers+lines",
-        name = "2nd Interpolation",
-        x = xInterp,
-        y = yInterp
+        marker = dict(color = "#c134d1", size = 7),
+        mode = "markers+lines"
     )
     
     fig = go.Figure()
     fig.add_trace(curvePlot)
     fig.add_trace(pointPlot)
     fig.add_trace(interpolatedPlot)
-    fig.update_layout(width = 500, height = 500)
-    standard = dict(range = [-1,6], zeroline = False, showgrid = False, visible = False, scaleratio = 1)
+    fig.update_layout(width = 700, height = 500, plot_bgcolor = 'rgba(0,0,0,0)')
+    standard = dict(range = [-0.5,5.5], zeroline = False, showgrid = False, visible = False, scaleratio = 1)
     fig.update_xaxes(standard)
     fig.update_yaxes(standard, scaleanchor = "x", )
     
+    #WIDGET AND UPDATE FUNCTIONS FOR GRAPHS
     xWidget, yWidget, tWidget = GetCurvePlotWidgets()
     
     @interact(xData = xWidget, yData = yWidget, t = tWidget)
@@ -98,3 +83,17 @@ def CurvePlot():
             fig.data[2].x = xInterp
             fig.data[2].y = yInterp
         return fig
+
+def GetCurvePlotWidgets():
+    """ Returns the widgets needed for the Curve Plot
+    An Oranization method to help declutter
+    """
+    tStepsize = 1/32
+    stepsize = 5/32
+    tWidget = widgets.FloatSlider(min = 0, max = 1, value = 0.5, step = tStepsize, description = "t")
+    xWidget = widgets.FloatSlider(min = 0, max = 5, value = 0, step = stepsize, readout = False, description = "x")
+    yWidget = widgets.FloatSlider(min = 0, max = 5, value = 0, step = stepsize, readout = False, description = "y")
+    xWidget.style.handle_color = "#db4a40" #red
+    yWidget.style.handle_color = "#a5db40" #Green (lime)
+    tWidget.style.handle_color = "#c134d1" #Purple
+    return xWidget, yWidget, tWidget

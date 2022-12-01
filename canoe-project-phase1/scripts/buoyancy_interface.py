@@ -13,7 +13,7 @@ from IPython.display import display
 import scripts.models.cubeModel as cm
 import scripts.models.canoeModel as canoe 
 import scripts.models.graphics as graphics
-import scripts.buoyancy_equilibrium as eq
+import scripts.Buoyancy_Equilibrium as eq
 
 GLOBAL_WaterDensity = 997     #(kg / m^3)
 GLOBAL_Gravity      = 9.80665 #(m/s^2)
