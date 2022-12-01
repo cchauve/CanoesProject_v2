@@ -8,8 +8,7 @@ from ipywidgets import interact, fixed, interact_manual #, interactive
 import ipywidgets as widgets
 from IPython.display import display
 
-
-def Canoe():
+def GetWidgets():
     stepSize = 0.05
     widgetLength = widgets.FloatSlider(min = 4, 
                                  max = 10, 
@@ -35,13 +34,22 @@ def Canoe():
     widgetNames   = widgets.Dropdown(options = [("Nootkan-Style Canoe", 1), ("Haida-Dugout Canoe", 2)],
                               value = 1,
                               description = "Canoe type: ")
-    
-    widgets.interact_manual(CanoeGraph, length = widgetLength, width = widgetWidth, height = widgetHeight, name   = widgetNames)
-    
 
-def CanoeGraph(length, width, height, name):   
-    XX, YY, ZZ = canoe.GetCanoe(length, width, height, name, 4)
-    YY_mirror = np.multiply(YY, -1)
+    return [widgetLength, widgetWidth, widgetHeight, widgetNames]
+
+def Canoe(widgetLength, widgetWidth, widgetHeight, widgetNames):
+    """
+    Brings up the ui for the Canoe visualizer
+    """
+    im = interact_manual.options(manual_name = "refresh")
+    im(CanoeGraph, length = widgetLength, width = widgetWidth, height = widgetHeight, canoe_type = widgetNames)
+
+def CanoeGraph(length, width, height, canoe_type):
+    """ Takes a length, width, height, and name(type) will properly name next push
+    Outputs nothing, but displays the canoe graph
+    """
+    XX, YY, ZZ = canoe.GetCanoe(length, width, height, canoe_type, 4)
+    YY_mirror = np.multiply(YY, -1) #Since we only generate half a canoe
     
     myColor = np.ones(shape = XX.shape)
     #remove axis labels
@@ -59,9 +67,7 @@ def CanoeGraph(length, width, height, name):
                         contours ={"z": {"show": True, "start": 0.02, "end": 0.7, "size": 0.15, "color":"white"}})
     
     axisDictionary = dict(title = '', showbackground = False, showgrid = False, showline = False, showticklabels = False)
+    sceneDictionary = dict( aspectmode= "data", xaxis = axisDictionary, yaxis = axisDictionary, zaxis = axisDictionary)
     fig = go.Figure(data = [trace1, trace2])
-    fig.update_layout(scene = dict( aspectmode= "data",
-                                    xaxis = axisDictionary,
-                                    yaxis = axisDictionary,
-                                    zaxis = axisDictionary))
+    fig.update_layout(scene = sceneDictionary)
     fig.show()

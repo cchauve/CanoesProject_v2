@@ -12,7 +12,6 @@ from IPython.display import display
 
 import scripts.models.cubeModel as cm
 import scripts.models.canoeModel as canoe 
-import scripts.visualization as vs
 import scripts.models.graphics as graphics
 import scripts.buoyancy_equilibrium as eq
 
@@ -81,53 +80,14 @@ def CubeGraph():
     )
     display(ui, out)
 
-def CanoeGraph():
+def CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames):
     """
     Ultimate UI call for the canoe Graph,
     set up sliders, labels, and ui position. As well as calling the the method to display everything
-    """
-    stepSize = 0.05
-    widgetLength = widgets.FloatSlider(
-        min   = 4, 
-        max   = 10, 
-        step  = stepSize, 
-        value = 7.687, 
-        description = "length (m)", 
-        continuous_update = False
-    )
-    
-    widgetWidth = widgets.FloatSlider(
-        min   = 0.1, 
-        max   = 3, 
-        step  = stepSize, 
-        value = 1.250, 
-        description = "width (m)", 
-        continuous_update = False
-    )
-    
-    widgetHeight = widgets.FloatSlider(
-        min   = 0.1, 
-        max   = 3, 
-        step  = stepSize, 
-        value = 1.135, 
-        description = "height (m)", 
-        continuous_update = False
-    )
-    
-    widgetNames = widgets.Dropdown(
-        options = [("Nootkan-Style Canoe", 1), ("Haida-Dugout Canoe", 2)],
-        value = 1,
-        description = "Canoe type: "
-    )
-    
+    """   
     "STARTS THE INTERACTABLE GRAPH"
-    widgets.interact_manual(
-        GenerateBoatGraph, 
-        length     = widgetLength, 
-        width      = widgetWidth, 
-        height     = widgetHeight, 
-        canoe_type = widgetNames
-    )
+    im = interact_manual.options(manual_name = "refresh")
+    im(GenerateBoatGraph, length = widgetLength, width = widgetWidth, height = widgetHeight, canoe_type = widgetNames)
     
 def figureSetup(traces, width, height, showlegend = False, xRange = None, yRange = None):
     """
@@ -145,7 +105,7 @@ def figureSetup(traces, width, height, showlegend = False, xRange = None, yRange
     )
     fig.update_yaxes()
     fig.update_xaxes(range = xRange, title_text = "meters") #tickprefix = "m" but looks cluttered
-    fig.update_yaxes(range = yRange, title_text = "meters",scaleanchor = "x", scaleratio = 1, )
+    fig.update_yaxes(range = yRange, title_text = "meters",scaleanchor = "x", scaleratio = 1)
     
     return fig
     
@@ -200,7 +160,7 @@ def WaterLevelCubeGraph(length = 5, width = 5, height = 5, density = 0.5, resolu
         return fig
 
 
-def GenerateBoatGraph(length, width, height, canoe_type, resolution = 4):
+def GenerateBoatGraph(length, width, height, canoe_type):
     """ 
     An interactive graph with a slider for weight. Shows where the equilibrium of the boat is depending on weight, 
     along with a side view of said boat with a line at equilibrium level.
@@ -208,6 +168,7 @@ def GenerateBoatGraph(length, width, height, canoe_type, resolution = 4):
     #variable set up
     mass = 100
     symmetry = 2
+    resolution = 4
     
     XX, YY, ZZ = canoe.GetCanoe(length, width, height, canoe_type, resolution)
     heightNormalArea = eq.GenerateVectorList(XX,YY,ZZ)
