@@ -1,7 +1,7 @@
 # Mathematical Canoes and Canoe Buoyancy
 These are notebooks about First Nation canoes and the mathematics we can use to model them. This is not a piece about coding. This is about what mathematical tools we can use to create and retrieve valuable information about the Canoes.  
 
-Users only need to import the Interface Scripts and call<br />
+Users only need to import the Interface Scripts<br />
 <code> import scripts.BezierCurve_Interface as bci</code><br />
 <code> import scripts.BezierSurf_Interface as bsi</code><br />
 <code> import scripts.Buoyancy_Interface as bi </code>
