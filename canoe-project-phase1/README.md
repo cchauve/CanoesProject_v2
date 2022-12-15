@@ -1,7 +1,7 @@
 # Mathematical Canoes and Canoe Buoyancy
 These are notebooks about First Nation canoes and the mathematics we can use to model them. This is not a piece about coding. This is about what mathematical tools we can use to create and retrieve valuable information about the Canoes.  
 
-Users only need to import the Interface Scripts and call<br />
+Users only need to import the Interface Scripts<br />
 <code> import scripts.BezierCurve_Interface as bci</code><br />
 <code> import scripts.BezierSurf_Interface as bsi</code><br />
 <code> import scripts.Buoyancy_Interface as bi </code>
@@ -9,10 +9,10 @@ Users only need to import the Interface Scripts and call<br />
 The interactive graphs are<br />
 <code> bci.CurveGraph() </code>
 
-<code> widgetLength, widgetWidth, widgetHeight, widgetNames = bsi.GetWidgets() <br />
-bsi.Canoe(widgetLength, widgetWidth, widgetHeight, widgetNames) <br />
-bi.CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames)
-</code>
+<code> widgetLength, widgetWidth, widgetHeight, widgetNames = bsi.GetWidgets()</code><br />
+<code>bsi.Canoe(widgetLength, widgetWidth, widgetHeight, widgetNames)</code><br />
+<code>bi.CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames)</code>
+
 
 <code> bi.CubeGraph() </code>
 
