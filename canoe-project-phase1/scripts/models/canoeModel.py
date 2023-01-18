@@ -31,7 +31,7 @@ def GetCanoeNootkan(length, width, height):
         [[ 7.037 + a  ,-0.179 - b*3/4, 0.711 + c], [7.217 + a  , 0, 0.387]],
         [[ 7.666 + a  ,-0.087 - b/4  , 1.135 + c], [7.687 + a  , 0, 0.898]]
         ]
-    #U is for the inner list direction from p[i][j] to p[i][j+1]
+    #U is for the inner list direction from p[i][j] to p[i][j+1] "horizontal"
     U = [
         [[-0.0135 ,-0.0016  ,-0.162]  , [0.018  , 0.0315  ,-0.1327]],
         [[ 0.0016 , 0.204   ,-0.274]  , [0.03225, 0.10523 , 0]],
@@ -40,7 +40,7 @@ def GetCanoeNootkan(length, width, height):
         [[ 0.0477 , 0.086623,-0.07052], [0.0399 , 0.028651,-0.0615]],
         [[ 0.005  , 0.023835,-0.0634] , [0.0073 , 0.018603,-0.05214]]
         ]
-    #V is for the inner list direction from p[i][j] to p[i+1][j]
+    #V is for the inner list direction from p[i][j] to p[i+1][j] "vertical"
     V = [
         [[0.35863, 0.02412,-0.05928], [0.27386, 0,-0.034092]],
         [[0.5837 ,-0.15418,-0.01687], [0.2287 , 0,-0.0004]],

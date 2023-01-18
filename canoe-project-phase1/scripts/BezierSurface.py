@@ -27,60 +27,49 @@ def GetSurface(p, u, v, n):
     P = np.array(p)
     U = np.array(u)
     V = np.array(v)
+    
+    #an intialized point tile. This allows us to simplify some math
+    M = [[[0]*3 for i in range(4)] for i in range(4)]
     columns = len(P[0])-1 #columns of P
     rows = len(P)-1       #ros of P,
     
     #adding one for the included endpoint, all numbers repeat mod 1, we sample our t points from this instead of calculating them
-    T = np.linspace(0, 1, n+1, endpoint = True)
+    T = np.linspace(0, 1, n+1*0, endpoint = True)
     
-    rowsLinspace = np.linspace(0, 1*rows   , n*rows    + 1, endpoint = True)
-    colsLinspace = np.linspace(0, 1*columns, n*columns + 1, endpoint = True)
+    rowsLinspace = np.linspace(0, 1*rows   , n*rows    + 1*0, endpoint = True)
+    colsLinspace = np.linspace(0, 1*columns, n*columns + 1*0, endpoint = True)
     XX, YY    = np.meshgrid(colsLinspace, rowsLinspace)
     ZZ, dummy = np.meshgrid(colsLinspace, rowsLinspace)
-    
-    #GENERATE THE TOP LINES FOR LATER INTERPOLATION
-    for i in range(0, rows+1):
-        for j in range(0, columns):
-            A = P[i][j  ]
-            D = P[i][j+1]
-
-            B = A + U[i][j  ]
-            C = D - U[i][j+1]
-            # Generate the top line, n+1 = len(T)
-            for t in range(0, n+1):  
-                point = BCurve(A, B, C, D, T[t])
-                #print(point)
-                #[i*n][j*n + t] are the i'th tile row, and j'th tile column, at subposition t
-                XX[i * n][j*n + t] = point[0]
-                YY[i * n][j*n + t] = point[1]
-                ZZ[i * n][j*n + t] = point[2]
     
     #FILL IN FROM TOP TO BOTTOM USING THE TOP LINES
     for i in range(0, rows):
         for j in range(0, columns):
             #for each tile, generate the grid in it.
-            #using the top and bottom generated points, and the 
-            #interpolated handles, it generates the grid inbetween. 
-            
-            B_ha = V[i][j]   
-            B_hb = V[i][j]   + U[i][j]
-            B_hc = V[i][j+1] - U[i][j+1] #negative U[i][j+1] to orientate properly for interpolation
-            B_hd = V[i][j+1]
+            #Corner points.
+            M[0][0] = P[i  ][ j  ]
+            M[0][3] = P[i  ][ j+1]
+            M[3][0] = P[i+1][ j  ]
+            M[3][3] = P[i+1][ j+1]
+            #Border points.
+            M[0][1] = M[0][0] + U[i  ][ j  ]
+            M[0][2] = M[0][3] - U[i  ][ j+1]
+            M[3][1] = M[3][0] + U[i+1][ j  ]
+            M[3][2] = M[3][3] - U[i+1][ j+1]
 
-            C_ha = V[i+1][j]
-            C_hb = V[i+1][j]   + U[i+1][j]
-            C_hc = V[i+1][j+1] - U[i+1][j+1]
-            C_hd = V[i+1][j+1]
-            
-            for t in range(0, n+1):
-                A = [XX[ i   *n][j*n + t], YY[ i   *n][j*n + t], ZZ[ i   *n][j*n + t]]
-                D = [XX[(i+1)*n][j*n + t], YY[(i+1)*n][j*n + t], ZZ[(i+1)*n][j*n + t]]
-                
-                B = A + Lerp(B_ha, B_hd, T[t])  
-                C = D - Lerp(C_ha, C_hd, T[t])
-                for s in range(1, n): #(1, n = len(T)-1) because top and bottom already generated 
-                    point = BCurve(A, B, C, D, T[s])
-                    
+            M[1][0] = M[0][0] + V[i  ][ j  ]
+            M[2][0] = M[3][0] - V[i+1][ j  ]
+            M[1][3] = M[0][3] + V[i  ][ j+1]
+            M[2][3] = M[3][3] - V[i+1][ j+1]
+            #Center points.
+            M[1][1] = M[0][1] + V[i  ][ j  ]
+            M[1][2] = M[0][2] + V[i  ][ j+1]
+            M[2][1] = M[3][1] - V[i+1][ j  ]
+            M[2][2] = M[3][2] - V[i+1][ j+1]
+            #print(M)
+            for t in range(0, n):
+                for s in range(0, n): 
+                    point = BSurf(M, T[t],T[s])
+                    #print(point)
                     XX[i*n+s][j*n+t] = point[0]
                     YY[i*n+s][j*n+t] = point[1]
                     ZZ[i*n+s][j*n+t] = point[2]
@@ -96,16 +85,30 @@ Outputs a point in the same dimension
 """
 def BCurve(A,B,C,D, t):
     
-    A0 = np.multiply(A, -1*t**3 + 3*t**2 - 3*t + 1)
-    B0 = np.multiply(B,  3*t**3 - 6*t**2 + 3*t)
-    C0 = np.multiply(C, -3*t**3 + 3*t**2)
-    D0 = np.multiply(D,  1*t**3)
+    A0 = np.multiply(A, Bweights(1,t))
+    B0 = np.multiply(B, Bweights(2,t))
+    C0 = np.multiply(C, Bweights(3,t))
+    D0 = np.multiply(D, Bweights(4,t))
     return A0 + B0 + C0 + D0 #arrays can add onto eachother nicely.
+
+def BSurf(M, t,s):
+    point = np.array([0]*3)
+    for i in range (0,4):
+        point = np.add(point, np.multiply(BCurve(M[i][0], M[i][1], M[i][2], M[i][3], t) , Bweights(i+1, s)))
+    return point
+
+def Bweights(weightNumber, t):
+    if (weightNumber == 1): return -1*t**3 + 3*t**2 - 3*t + 1
+    if (weightNumber == 2): return  3*t**3 - 6*t**2 + 3*t
+    if (weightNumber == 3): return -3*t**3 + 3*t**2
+    return                          1*t**3
+
 """
 A linear interpolation between A and B
 using the interpolation value t in [0,1] range.
 
 Outputs a point in the same dimension
+TECHNICALLY NOT NEEDED, MIGHT REMOVE.
 """
 def Lerp(A, B, t):
     A0 = np.multiply(A, -t + 1)
