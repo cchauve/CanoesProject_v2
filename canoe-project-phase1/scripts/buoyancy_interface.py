@@ -80,14 +80,15 @@ def CubeGraph():
     )
     display(ui, out)
 
-def CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames):
+def CanoeBuoyancy(widgetLengthScale, widgetWidthScale, widgetHeightScale, widgetNames):
     """
     Ultimate UI call for the canoe Graph,
     set up sliders, labels, and ui position. As well as calling the the method to display everything
     """   
     "STARTS THE INTERACTABLE GRAPH"
     im = interact_manual.options(manual_name = "refresh")
-    im(GenerateBoatGraph, length = widgetLength, width = widgetWidth, height = widgetHeight, canoe_type = widgetNames)
+    args = {"lengthScale":widgetLengthScale, "widthScale": widgetWidthScale, "heightScale":widgetHeightScale, "canoe_type":widgetNames}
+    im(GenerateBoatGraph, **args)
     
 def figureSetup(traces, width, height, showlegend = False, xRange = None, yRange = None):
     """
@@ -160,17 +161,23 @@ def WaterLevelCubeGraph(length = 5, width = 5, height = 5, density = 0.5, resolu
         return fig
 
 
-def GenerateBoatGraph(length, width, height, canoe_type):
+def GenerateBoatGraph(lengthScale, widthScale, heightScale, canoe_type):
     """ 
     An interactive graph with a slider for weight. Shows where the equilibrium of the boat is depending on weight, 
     along with a side view of said boat with a line at equilibrium level.
     """
     #variable set up
-    mass = 100
     symmetry = 2
     resolution = 4
+    XX, YY, ZZ = canoe.GetCanoe([lengthScale, widthScale, heightScale], canoe_type, resolution)
+    length = 0
+    height = 0
+    for i in range(0, len(XX)):
+        for j in range(0, len(XX[0])):
+            if (XX[i][j] > length): length = XX[i][j]
+            if (ZZ[i][j] > height): height = ZZ[i][j] 
     
-    XX, YY, ZZ = canoe.GetCanoe(length, width, height, canoe_type, resolution)
+    print(length)
     heightNormalArea = eq.GenerateVectorList(XX,YY,ZZ)
     maxWeight = abs(eq.CalculateForce(heightNormalArea, height) / GLOBAL_Gravity)
     stepsize = maxWeight/(64)
@@ -178,7 +185,7 @@ def GenerateBoatGraph(length, width, height, canoe_type):
     xLine, zLine = getCanoeBorder(XX,ZZ)
     
     #plot setup
-    xRange = [-0.125 * length, 1.125 * length]
+    xRange = [ (0.5-0.75) * length, (0.75+0.5)*length]
     yRange = [-1.1 * height, 1.1 * height]
     levelTrace = go.Scatter(
         x = [-0.5*length, 1.5*length], 
@@ -197,7 +204,7 @@ def GenerateBoatGraph(length, width, height, canoe_type):
     fig = figureSetup([sideTrace, levelTrace], width = 700, height = 500, xRange = xRange, yRange = yRange) 
     
     #widget setup
-    massWidget = widgets.FloatSlider(min = 0, max = maxWeight, step = stepsize, description = "mass (kg)", value = maxWeight)
+    massWidget = widgets.FloatSlider(min = 0, max = maxWeight*1.4, step = stepsize, description = "mass (kg)", value = maxWeight)
     massWidget.style.handle_color = "#141414"
     
     @interact(mass = massWidget) 
