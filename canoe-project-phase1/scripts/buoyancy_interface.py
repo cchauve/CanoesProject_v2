@@ -177,7 +177,6 @@ def GenerateBoatGraph(lengthScale, widthScale, heightScale, canoe_type):
             if (XX[i][j] > length): length = XX[i][j]
             if (ZZ[i][j] > height): height = ZZ[i][j] 
     
-    print(length)
     heightNormalArea = eq.GenerateVectorList(XX,YY,ZZ)
     maxWeight = abs(eq.CalculateForce(heightNormalArea, height) / GLOBAL_Gravity)
     stepsize = maxWeight/(64)
@@ -201,7 +200,7 @@ def GenerateBoatGraph(lengthScale, widthScale, heightScale, canoe_type):
     )
     
     #Change the list order for traces to change render order
-    fig = figureSetup([sideTrace, levelTrace], width = 700, height = 500, xRange = xRange, yRange = yRange) 
+    fig = figureSetup([sideTrace, levelTrace], width = 1080, height = 720, xRange = xRange, yRange = yRange) 
     
     #widget setup
     massWidget = widgets.FloatSlider(min = 0, max = maxWeight*1.4, step = stepsize, description = "mass (kg)", value = maxWeight)
