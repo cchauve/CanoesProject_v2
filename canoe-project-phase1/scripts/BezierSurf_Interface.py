@@ -9,7 +9,6 @@ import ipywidgets as widgets
 from IPython.display import display
 
 def GetWidgets():
-    stepSize = 0.05
     widgetMaker = lambda de: widgets.FloatSlider(
         min=0.05,
         max=2.0,
@@ -57,9 +56,9 @@ def CanoeGraph(lengthScale, widthScale, heightScale, canoe_type):
     width *= 2 #since we only measured from the middle out.
     f2str = lambda x:  "{:.4f}".format(x)
     titleStr = "Length: " + f2str(length) + "(m)\twidth: " + f2str(width) + "(m)\theight: " + f2str(height) +"(m)" 
-    """
-    DEBUG
-    P, V, U = canoe.GetCanoeKutenai()
+    
+    """ DEBUG
+    P, V, U = canoe.GetCanoeHaida()
     n_rows = len(P)
     n_cols = len(P[0])
 
@@ -107,10 +106,12 @@ def CanoeGraph(lengthScale, widthScale, heightScale, canoe_type):
                 vY[vectorIndex+1] = vector[1] + V[i][j][1][1]
                 vZ[vectorIndex+1] = vector[2] + V[i][j][1][2]
     
-    trace3 = go.Scatter3d(x = sX, y= sY, z = sZ, mode= 'markers')
-    trace4 = go.Scatter3d(x = uX, y= uY, z = uZ, mode= 'markers')
-    trace5 = go.Scatter3d(x = vX, y= vY, z = vZ, mode= 'markers')
+    traceU = go.Scatter3d(x = sX, y= sY, z = sZ, mode= 'markers')
+    traceV = go.Scatter3d(x = uX, y= uY, z = uZ, mode= 'markers')
+    traceP = go.Scatter3d(x = vX, y= vY, z = vZ, mode= 'markers')
     """
+    
+    
 
 
     YY_mirror = np.multiply(YY, -1) #Since we only generate half a canoe
@@ -129,7 +130,7 @@ def CanoeGraph(lengthScale, widthScale, heightScale, canoe_type):
     
     axisDictionary = dict(title = '', showbackground = False, showgrid = False, showline = False, showticklabels = False)
     sceneDictionary = dict( aspectmode= "data", xaxis = axisDictionary, yaxis = axisDictionary, zaxis = axisDictionary)
-    #fig = go.Figure(data = [trace1, trace2])
     fig = go.Figure(data = [trace1, trace2])
+    #fig = go.Figure(data = [trace1, trace2, traceU, traceV, traceP])
     fig.update_layout(scene = sceneDictionary, title = titleStr,  width = 1080, height = 720)
     fig.show()
