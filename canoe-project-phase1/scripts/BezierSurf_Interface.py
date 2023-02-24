@@ -9,29 +9,29 @@ import ipywidgets as widgets
 from IPython.display import display
 
 def GetWidgets():
-    widgetMaker = lambda de: widgets.FloatSlider(
-        min=0.05,
-        max=2.0,
-        step=0.05,
-        value=1,
+    widgetMaker = lambda min_size,max_size,de: widgets.FloatSlider(
+        min=min_size,
+        max=max_size,
+        step=(max_size-min_size)/128,
+        value=(max_size+min_size)/2,
         continuous_update=False,
         description=de)
 
-    widgetLengthScale = widgetMaker("length scale")
-    widgetWidthScale  = widgetMaker("width scale")
-    widgetHeightScale = widgetMaker("height scale")
+    widgetLength = widgetMaker(4,10,"length (m)")
+    widgetWidth  = widgetMaker(0.5,1.5,"width (m)")
+    widgetHeight = widgetMaker(0.25,1.25,"height (m)")
 
     canoeOptions = [("Nootkan-Style Canoe", 1), ("Haida-Dugout Canoe", 2), ("Kutenai Canoe",3)]
     widgetNames = widgets.Dropdown(options = canoeOptions, value = 3, description = "Canoe type: ")
-    return [widgetLengthScale, widgetWidthScale, widgetHeightScale, widgetNames]
+    return [widgetLength, widgetWidth, widgetHeight, widgetNames]
 
 """
     Brings up the ui for the Canoe visualizer
 """
-def Canoe(widgetLengthScale, widgetWidthScale, widgetHeightScale, widgetNames):
+def Canoe(widgetLength, widgetWidth, widgetHeight, widgetNames):
     
     im = interact_manual.options(manual_name = "refresh")
-    args = {"lengthScale":widgetLengthScale, "widthScale": widgetWidthScale, "heightScale":widgetHeightScale, "canoe_type":widgetNames}
+    args = {"length":widgetLength, "width": widgetWidth, "height":widgetHeight, "canoe_type":widgetNames}
     im(CanoeGraph, **args)
 
 """ Plots the canoe_type, with the given scaling
@@ -39,21 +39,11 @@ scale      - [float, float, float]
 canoe_type - integer 
 
 """
-def CanoeGraph(lengthScale, widthScale, heightScale, canoe_type):
+def CanoeGraph(length, width, height, canoe_type):
     """ Takes a length, width, height, and name(type) will properly name next push
     Outputs nothing, but displays the canoe graph
     """
-
-    XX, YY, ZZ = canoe.GetCanoe([lengthScale, widthScale, heightScale], canoe_type, 8)
-    length = 0
-    height = 0
-    width = 0
-    for i in range(0, len(XX)):
-        for j in range(0, len(XX[0])):
-            if (XX[i][j] > length): length = XX[i][j]
-            if (ZZ[i][j] > height): height = ZZ[i][j] 
-            if (abs(YY[i][j]) > width): width = abs(YY[i][j])
-    width *= 2 #since we only measured from the middle out.
+    XX, YY, ZZ = canoe.GetCanoe(length, width, height, canoe_type, 8)
     f2str = lambda x:  "{:.4f}".format(x)
     titleStr = "Length: " + f2str(length) + "(m)\twidth: " + f2str(width) + "(m)\theight: " + f2str(height) +"(m)" 
     
@@ -111,9 +101,6 @@ def CanoeGraph(lengthScale, widthScale, heightScale, canoe_type):
     traceP = go.Scatter3d(x = vX, y= vY, z = vZ, mode= 'markers')
     """
     
-    
-
-
     YY_mirror = np.multiply(YY, -1) #Since we only generate half a canoe
     myColor = np.ones(shape = XX.shape)
     #remove axis labels

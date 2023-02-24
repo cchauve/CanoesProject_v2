@@ -4,6 +4,7 @@ everything should be in one function (as this script will be bulky enough)
 Any method these scripts use should be outsourced to seperate python files, unless it's small and meaningfull addition.
 """
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import numpy as np
 
 from ipywidgets import interact, fixed, interact_manual #, interactive
@@ -24,43 +25,18 @@ def CubeGraph():
     Ultimate UI call for the canoe Graph,
     set up sliders, labels, and ui position. As well as calling the the method to display everything
     """
-    stepSize = 0.05
-    length = widgets.FloatSlider(
-        min = 0.01,                                  
-        max = 2,                          
-        step = stepSize,                                 
-        value = 1,                              
-        description = "length (m): ",                      
-        continuous_update = False
-    )
-    
-    width  = widgets.FloatSlider(
-        min = 0.01,                                
-        max = 2,                               
-        step = stepSize,                              
-        value = 1,                                 
-        description = "width (m): ",                            
-        continuous_update = False
-    )
-    
-    height = widgets.FloatSlider(
-        min = 0.01,                                
-        max = 2,                          
-        step = stepSize,                            
-        value = 1,                          
-        description = "height (m): ",        
-        continuous_update = False
-    )
-    
-    density = widgets.FloatSlider(
-        min = 0.1,                         
-        max = GLOBAL_WaterDensity * 1.05,                              
-        value = 750 ,                                
-        step = stepSize,                                 
-        description = "density: ",                            
-        continuous_update = False
-    )
-    
+    widgetMaker = lambda min_size, max_size, value, subdivisions, de: widgets.FloatSlider(
+        min = min_size,
+        max = max_size,
+        step = (max_size-min_size)/subdivisions,
+        value = value,
+        description = de,
+        continuous_update = False)
+    length = widgetMaker(0.01, 2, 1, 64, "length (m): ")
+    width = widgetMaker(0.01, 2, 1, 64, "width (m): ")
+    height = widgetMaker(0.01, 2, 1, 64, "height (m): ")
+    density = widgetMaker(0.1, GLOBAL_WaterDensity * 1.05, 750, 256, "density: ")
+     
     density.style.handle_color = "#141414"
     
     ui = widgets.TwoByTwoLayout(
@@ -80,14 +56,14 @@ def CubeGraph():
     )
     display(ui, out)
 
-def CanoeBuoyancy(widgetLengthScale, widgetWidthScale, widgetHeightScale, widgetNames):
+def CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames):
     """
     Ultimate UI call for the canoe Graph,
     set up sliders, labels, and ui position. As well as calling the the method to display everything
     """   
     "STARTS THE INTERACTABLE GRAPH"
     im = interact_manual.options(manual_name = "refresh")
-    args = {"lengthScale":widgetLengthScale, "widthScale": widgetWidthScale, "heightScale":widgetHeightScale, "canoe_type":widgetNames}
+    args = {"length":widgetLength, "width": widgetWidth, "height":widgetHeight, "canoe_type":widgetNames}
     im(GenerateBoatGraph, **args)
     
 def figureSetup(traces, width, height, showlegend = False, xRange = None, yRange = None):
@@ -161,7 +137,7 @@ def WaterLevelCubeGraph(length = 5, width = 5, height = 5, density = 0.5, resolu
         return fig
 
 
-def GenerateBoatGraph(lengthScale, widthScale, heightScale, canoe_type):
+def GenerateBoatGraph(length, width, height, canoe_type):
     """ 
     An interactive graph with a slider for weight. Shows where the equilibrium of the boat is depending on weight, 
     along with a side view of said boat with a line at equilibrium level.
@@ -169,19 +145,22 @@ def GenerateBoatGraph(lengthScale, widthScale, heightScale, canoe_type):
     #variable set up
     symmetry = 2
     resolution = 4
-    XX, YY, ZZ = canoe.GetCanoe([lengthScale, widthScale, heightScale], canoe_type, resolution)
-    length = 0
-    height = 0
-    for i in range(0, len(XX)):
-        for j in range(0, len(XX[0])):
-            if (XX[i][j] > length): length = XX[i][j]
-            if (ZZ[i][j] > height): height = ZZ[i][j] 
-    
+    XX, YY, ZZ = canoe.GetCanoe(length, width, height, canoe_type, resolution)
+    f2str = lambda x:  "{:.4f}".format(x)
+    titleStr = "Length: " + f2str(length) + "(m)\tWidth: " + f2str(width) + "(m)\tHeight: " + f2str(height) +"(m)" 
+
     heightNormalArea = eq.GenerateVectorList(XX,YY,ZZ)
     maxWeight = abs(eq.CalculateForce(heightNormalArea, height) / GLOBAL_Gravity)
     stepsize = maxWeight/(64)
     
+    #for the sideTrace canoe outline
     xLine, zLine = getCanoeBorder(XX,ZZ)
+
+    #for the mass vs level graph
+    massData = np.linspace(0, maxWeight, num = 32, endpoint = True)
+    waterLevelData = np.linspace(0, 1, num = 32, endpoint = True)
+    for i in range(32):
+        waterLevelData[i] = eq.BinarySearch(heightNormalArea, weight = massData[i] * GLOBAL_Gravity ,symmetryMultiplier = symmetry)
     
     #plot setup
     xRange = [ (0.5-0.75) * length, (0.75+0.5)*length]
@@ -189,18 +168,41 @@ def GenerateBoatGraph(lengthScale, widthScale, heightScale, canoe_type):
     levelTrace = go.Scatter(
         x = [-0.5*length, 1.5*length], 
         y = [0, 0],
-        visible = False,
+        visible = True, 
         line = dict(color = "#1991df", width = 3)
     )
     sideTrace = go.Scatter(
         x = xLine, 
         y = zLine, 
-        visible = False, 
+        visible = True, 
         line = dict(color = "#141414", width = 3)
     )
+    massLevelTrace = go.Scatter(
+        x = massData,
+        y = waterLevelData,
+        visible = True,
+        line = dict(color = "#141414", width = 3)
+    )
+
     
+    """
+    MAKE SUBGRAPH ON THE SIDE THAT SHOWS THE MASS vs WaterHeight
+    """
+
     #Change the list order for traces to change render order
-    fig = figureSetup([sideTrace, levelTrace], width = 1080, height = 720, xRange = xRange, yRange = yRange) 
+    fig = make_subplots(
+        rows = 1, cols = 2,
+        column_widths=[0.7, 0.3],
+        subplot_titles=("graphic", "mass vs waterlevel")
+    )
+    fig.update_layout(width = 1280, height = 720, title_text="bouyancy graph")
+    fig.update_xaxes(range = xRange, row = 1, col = 1)
+    fig.update_yaxes(range = yRange, row = 1, col = 1)
+    #graphicPlot = figureSetup([sideTrace, levelTrace], xRange = xRange, yRange = yRange) 
+    fig.add_trace(sideTrace,  row = 1, col = 1) #data 0
+    fig.add_trace(levelTrace, row = 1, col = 1) #data 1
+    fig.add_trace(massLevelTrace, row = 1, col = 2) #data 2
+
     
     #widget setup
     massWidget = widgets.FloatSlider(min = 0, max = maxWeight*1.4, step = stepsize, description = "mass (kg)", value = maxWeight)
@@ -213,7 +215,7 @@ def GenerateBoatGraph(lengthScale, widthScale, heightScale, canoe_type):
             fig.data[0].y = np.subtract(zLine, waterLevel)
             
             fig.update_layout(
-                title = "water level(m): " + "{:.4f}".format(waterLevel)
+                title = "water level(m): " + "{:.4f}".format(waterLevel) + "\t" + titleStr
             )
         return fig
     return None

@@ -94,8 +94,15 @@ Parses all the curve data into a string for export.
 """
 def ParseString(curvesDataV, curvesDataU):
     VectorToString = lambda vector: "["+"{:.3f}".format(vector[0])+","+"{:.3f}".format(vector[1])+","+"{:.3f}".format(vector[2])+"]"
+    GetLength = lambda vector: vector[0]
+    GetWidth  = lambda vector: abs(vector[1])
+    GetHeight = lambda vector: vector[2]
     num_v = len(curvesDataV)
     num_u = len(curvesDataV[0])
+    
+    max_length = 0
+    max_width = 0
+    max_height = 0
 
     P = "P =\t["
     V = "V =\t["
@@ -109,6 +116,15 @@ def ParseString(curvesDataV, curvesDataU):
         
         for j in range(num_u):
             P += VectorToString(curvesDataV[i][j][1]) + ","
+            if (GetLength(curvesDataV[i][j][1]) > max_length):
+                max_length = GetLength(curvesDataV[i][j][1])
+                
+            if (GetWidth (curvesDataV[i][j][1]) > max_width):
+                max_width  = GetWidth (curvesDataV[i][j][1])
+            
+            if (GetHeight(curvesDataV[i][j][1]) > max_height):
+                max_height = GetHeight(curvesDataV[i][j][1])
+            
             if (j < num_u-1):
                 #Get the vectors, else you are just collecting the last point.
                 V += "[" + VectorToString(curvesDataV[i][j  ][2]) + "," 
@@ -123,18 +139,29 @@ def ParseString(curvesDataV, curvesDataU):
 
         if (i!= num_v-1):
             U = U[:len(U)-1] + "],"
-        
+    
     #Backspace the last comma then close it up
     P = P[:len(P)-1] + "\n\t]"
     V = V[:len(V)-1] + "\n\t]"
     U = U[:len(U)-1] + "\n\t]"
-    return P + "\n\n" + V + "\n\n" + U
+    #width * 2 since the canoe/vessel is two times as long.
+    properties   = "length = "+"{:.3f}".format(max_length) + "\nwidth = "+"{:.3f}".format(max_width*2) + "\nheight = "+"{:.3f}".format(max_height)
+    length_scale = "ideal_length / length"
+    width_scale  = "ideal_width  / width"
+    height_scale = "ideal_height / height"
+    properties  += "\nif(onlyDimensions):\n\treturn [length,width,height]"
+    properties  += "\nscale = [" + length_scale + ", " + width_scale + ", " + height_scale + "]"
+    
+    functionCall = "P = ScaleArray(P, scale)\nV = ScaleSpecialArray(V, scale)\nU = ScaleSpecialArray(U, scale)"
+    return "#units in metric\n" + properties + "\n\n" + P + "\n\n" + V + "\n\n" + U + "\n\n" + functionCall
 
-curveName = "Kutenai"
+
+
+curveName = "Nootkan"
 curvesV = bpy.data.curves[curveName + " V"]
 curvesU = bpy.data.curves[curveName + " U"]
 curvesDataV, curvesDataU = InitializeCurves(curvesV, curvesU)
-#P,V,U = Parse(curvesDataV, curvesDataU)
+
 
 bpy.data.texts["Data"].write(ParseString(curvesDataV, curvesDataU))
 
