@@ -123,10 +123,12 @@ def BinarySearch(heightNormalArea, weight, binarySearchMax = 16, symmetryMultipl
     Performs a binary search to find the equilibrium depth dependent on the weight
     """
     searchMax, searchMin = GetMinMaxHeight(heightNormalArea) #reverse order so it would be in depth form.
-    
+    #print("max: ", searchMax)
+    #print("min: ", searchMin)
+
     searchDistance = abs(searchMax - searchMin)
-    searchMin -= searchDistance * 0.1
-    searchMax += searchDistance * 0.1
+    searchMin += searchDistance * 0.2
+    searchMax -= searchDistance * 0.1
     
     # ---searchMax ---
     #       |
@@ -137,12 +139,13 @@ def BinarySearch(heightNormalArea, weight, binarySearchMax = 16, symmetryMultipl
     #---searchMin ---
     for d in range(0, binarySearchMax):
         searchLevel = (searchMax + searchMin)/2.0
-        force = CalculateForce(heightNormalArea, searchLevel) * symmetryMultiplier
+        force = abs(CalculateForce(heightNormalArea, searchLevel) * symmetryMultiplier) #remove the abs, but investigate the negative aspect...
+        
+
         #Pascals to Newtons, based on area
         #kg/(m* s^2) * m^2 = kg m/ s^2 = (N)
         
-        if (force == weight):
-            return searchLevel
+        if (force == weight): break
         
         #something is wonky with the math below, need to investigate however this is working.
         #the force of water is less than our boats weight
@@ -154,7 +157,7 @@ def BinarySearch(heightNormalArea, weight, binarySearchMax = 16, symmetryMultipl
         #Clearly we can lower the water level and search lower
         if (force > weight):
             searchMin = searchLevel
-                 
+              
     return searchLevel
 
 
