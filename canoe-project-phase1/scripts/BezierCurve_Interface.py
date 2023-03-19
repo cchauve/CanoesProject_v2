@@ -28,28 +28,21 @@ def CurveGraph():
     yy = [0]*resolution
     
     ##PLOT CREATION
-    pointPlot = go.Scatter(
-        name = "1st Interpolation Line",
+    scatter = lambda name, mode ,line_color, width: go.Scatter(
+        name = name,
         visible = True,
-        mode = "markers+lines+text",
-        line = dict(color = "#2eb089", width = 3),
-        marker = dict(color = "#2eb089", size = 7),
-        text = ["P1", "P2", "P3"],
-        textposition = "bottom center"
+        mode = mode,
+        line = dict(color = line_color, width = width)
     )
-    curvePlot = go.Scatter(
-        name = "Bézier Curve",
-        visible = True,
-        line = dict(color = "#141414", width = 5),
-        mode = "lines"
-    )
-    interpolatedPlot = go.Scatter(
-        name = "2nd Interpolation Line",
-        visible = True,
-        line = dict(color = "#20808c", width = 3),
-        marker = dict(color = "#c134d1", size = 7),
-        mode = "markers+lines"
-    )
+    pointPlot = scatter("1st Interpolation Line", "markers+lines+text", "#2eb089", 3)
+    pointPlot.marker = dict(color = "#2eb089", size = 7)
+    pointPlot.text = ["P1", "P2", "P3"]
+    pointPlot.textposition = "bottom center"
+
+    curvePlot = scatter("Bézier Curve", "lines", "#141414", 5)
+
+    interpolatedPlot = scatter("2nd Interpolation Line", "markers+lines", "#20808c", 3)
+    interpolatedPlot.marker = dict(color = "#c134d1", size = 7)
     
     fig = go.Figure()
     fig.add_trace(curvePlot)

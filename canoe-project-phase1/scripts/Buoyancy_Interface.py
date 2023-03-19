@@ -61,7 +61,7 @@ def CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames):
     Ultimate UI call for the canoe Graph,
     Takes in the widgets from the Bezier Surface Interface script and will run the Bouyancy model of the canoe.
     """   
-    
+
     im = interact_manual.options(manual_name = "refresh")
     args = {"length":widgetLength, "width": widgetWidth, "height":widgetHeight, "canoe_type":widgetNames}
     im(GenerateBoatGraph, **args)
@@ -188,19 +188,16 @@ def GenerateBoatGraph(length, width, height, canoe_type):
     #Change the list order for traces to change render order
     fig = make_subplots(
         rows = 2, cols = 1,
-        #column_widths=[0.7, 0.3],
         subplot_titles=("Graphic", "Mass versus Waterlevel")
     )
     fig.update_layout(width = 1280, height = 720, title_text="bouyancy graph")
     fig.update_xaxes(range = xRange, row = 1, col = 1)
     fig.update_yaxes(range = yRange, row = 1, col = 1, scaleanchor ="x", scaleratio = 1)
-    #graphicPlot = figureSetup([sideTrace, levelTrace], xRange = xRange, yRange = yRange) 
-    fig.add_trace(sideTrace,  row = 1, col = 1) #data 0
-    fig.add_trace(levelTrace, row = 1, col = 1) #data 1
-    fig.add_trace(massLevelTrace, row = 2, col = 1) #data 2
-    fig.add_trace(massLevelInteractiveTrace, row = 2, col = 1) #data 3
-    
 
+    fig.add_trace(sideTrace,  row = 1, col = 1)                 #data 0
+    fig.add_trace(levelTrace, row = 1, col = 1)                 #data 1
+    fig.add_trace(massLevelTrace, row = 2, col = 1)             #data 2
+    fig.add_trace(massLevelInteractiveTrace, row = 2, col = 1)  #data 3
     
     #widget setup
     massWidget = widgets.FloatSlider(min = 0, max = maxWeight, step = stepsize, description = "Mass (kg)", value = maxWeight)
