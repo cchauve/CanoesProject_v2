@@ -59,9 +59,9 @@ def CubeGraph():
 def CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames):
     """
     Ultimate UI call for the canoe Graph,
-    set up sliders, labels, and ui position. As well as calling the the method to display everything
+    Takes in the widgets from the Bezier Surface Interface script and will run the Bouyancy model of the canoe.
     """   
-    "STARTS THE INTERACTABLE GRAPH"
+    
     im = interact_manual.options(manual_name = "refresh")
     args = {"length":widgetLength, "width": widgetWidth, "height":widgetHeight, "canoe_type":widgetNames}
     im(GenerateBoatGraph, **args)
@@ -116,6 +116,11 @@ def WaterLevelCubeGraph(length = 5, width = 5, height = 5, density = 0.5, resolu
                                            description = "depth (m)", layout = widgets.Layout(width = "50%"))
     
     waterLevelWidget.style.handle_color = "lightblue"
+
+    #helper lambda setup
+    f2str = lambda x:  "{:.2f}".format(x)
+    title_str = lambda weight, depth, force: "Cuboid weight: " + f2str(weight) + "(N)" + " Depth: " + f2str(depth) + "(m)" + " Total Force: " + f2str(force) + "(N)"
+
     @interact(waterLevel = waterLevelWidget)
     def update(waterLevel):
         with fig.batch_update():
@@ -127,10 +132,7 @@ def WaterLevelCubeGraph(length = 5, width = 5, height = 5, density = 0.5, resolu
             arrowMagnitude = (totalForce / (maximumForce)) * height * 1.2
             fig.data[2].x, fig.data[2].y = graphics.GetArrow(arrowX, arrowY, [0,1], arrowMagnitude, arrowMagnitude/2)
             
-            titleString  = "Cuboid weight: " 
-            titleString += "{:.2f}".format(cm.CalcWeight(length, width, height, density, gravity = GLOBAL_Gravity)) + "(N)"
-            titleString += " Depth: " + "{:.2f}".format(waterLevel) + "(m)"
-            titleString += " Total force: " + "{:.2f}".format(totalForce) + "(N)"
+            titleString  = title_str(cm.CalcWeight(length, width, height, density, gravity = GLOBAL_Gravity),waterLevel,totalForce) 
             fig.update_layout(
                 title = titleString
             )
@@ -148,23 +150,14 @@ def GenerateBoatGraph(length, width, height, canoe_type):
     XX, YY, ZZ = canoe.GetCanoe(length, width, height, canoe_type, resolution)
     #for the sideTrace canoe outline
     xLine, zLine, maxWaterLevel = getCanoeBorder(XX,ZZ)
-    #print(maxWaterLevel)
+
     f2str = lambda x:  "{:.4f}".format(x)
     titleStr = "Length: " + f2str(length) + "(m)\tWidth: " + f2str(width) + "(m)\tHeight: " + f2str(height) +"(m)" 
 
     heightNormalArea = eq.GenerateVectorList(XX,YY,ZZ)
-
-    #for i in range(len(heightNormalArea)):
-    #    for j in range(len(heightNormalArea[0])):
-    #        print(heightNormalArea[i][j])
-    #    print("\n\n")
-    
     maxWeight = abs(eq.CalculateForce(heightNormalArea, maxWaterLevel * 1.5) / GLOBAL_Gravity)
-    #maxWeight *= 1.4
     stepsize = maxWeight/(128)
     
-    
-
     #for the mass vs level graph
     graphResolution = 128
     massData = np.linspace(0, maxWeight, num = graphResolution, endpoint = True)
@@ -175,32 +168,19 @@ def GenerateBoatGraph(length, width, height, canoe_type):
     #plot setup
     xRange = [ (0.5-0.75) * length, (0.75+0.5)*length]
     yRange = [-1.1 * height, 1.1 * height]
-    levelTrace = go.Scatter(
-        x = [-0.5*length, 1.5*length], 
-        y = [0, 0],
-        visible = True, 
-        line = dict(color = "#1991df", width = 3)
-    )
-    sideTrace = go.Scatter(
-        x = xLine, 
-        y = zLine, 
-        visible = True, 
-        line = dict(color = "#141414", width = 3)
-    )
-    massLevelTrace = go.Scatter(
-        x = massData,
-        y = waterLevelData,
+
+    scatter = lambda X,Y, line_color:go.Scatter(
+        x = X,
+        y = Y,
         visible = True,
-        line = dict(color = "#141414", width = 3)
-    )
-    massLevelInteractiveTrace = go.Scatter(
-        x = [maxWeight,maxWeight],
-        y = [0, waterLevelData[graphResolution-1]],
-        visible = True,
-        line = dict(color = "#1991df", width = 3)
+        line = dict(color = line_color, width = 3)
     )
 
-    
+    levelTrace = scatter([-0.5*length, 1.5*length], [0,0], "#1991df")
+    sideTrace = scatter(xLine, zLine, "#141414")
+    massLevelTrace = scatter(massData, waterLevelData, "#141414")
+    massLevelInteractiveTrace = scatter([maxWeight,maxWeight], [0, waterLevelData[graphResolution-1]], "#1991df")
+
     """
     MAKE SUBGRAPH ON THE SIDE THAT SHOWS THE MASS vs WaterHeight
     """
@@ -209,7 +189,7 @@ def GenerateBoatGraph(length, width, height, canoe_type):
     fig = make_subplots(
         rows = 2, cols = 1,
         #column_widths=[0.7, 0.3],
-        subplot_titles=("graphic", "mass vs waterlevel")
+        subplot_titles=("Graphic", "Mass versus Waterlevel")
     )
     fig.update_layout(width = 1280, height = 720, title_text="bouyancy graph")
     fig.update_xaxes(range = xRange, row = 1, col = 1)
@@ -223,7 +203,7 @@ def GenerateBoatGraph(length, width, height, canoe_type):
 
     
     #widget setup
-    massWidget = widgets.FloatSlider(min = 0, max = maxWeight, step = stepsize, description = "mass (kg)", value = maxWeight)
+    massWidget = widgets.FloatSlider(min = 0, max = maxWeight, step = stepsize, description = "Mass (kg)", value = maxWeight)
     massWidget.style.handle_color = "#141414"
     
     @interact(mass = massWidget) 
@@ -235,7 +215,7 @@ def GenerateBoatGraph(length, width, height, canoe_type):
             fig.data[3].y = [0, waterLevel]
             
             fig.update_layout(
-                title = "water level(m): " + "{:.4f}".format(waterLevel) + "\t" + titleStr
+                title = "Bottom of the Canoe to Water Level(m): " + "{:.4f}".format(waterLevel) + "\t" + titleStr
             )
         return fig
     return None
