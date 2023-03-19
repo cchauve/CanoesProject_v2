@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
 
-from ipywidgets import interact, fixed, interact_manual #, interactive
+from ipywidgets import interact, fixed, interact_manual 
 import ipywidgets as widgets
 from IPython.display import display
 
@@ -58,7 +58,7 @@ def CubeGraph():
 
 def CanoeBuoyancy(widgetLength, widgetWidth, widgetHeight, widgetNames):
     """
-    Ultimate UI call for the canoe Graph,
+    Ultimate UI call for the canoe Graph\\
     Takes in the widgets from the Bezier Surface Interface script and will run the Bouyancy model of the canoe.
     """   
 
@@ -88,8 +88,8 @@ def figureSetup(traces, width, height, showlegend = False, xRange = None, yRange
     
 def WaterLevelCubeGraph(length = 5, width = 5, height = 5, density = 0.5, resolution = 64):
     """ 
-    A small interactive graph for a simple cube in water, water level is interactive.
-    Takes a length, depth, height, density, and resolution.
+    A small interactive graph for a simple cube in water, water level is interactive.\\
+    Takes a length, depth, height, density, and resolution.\\
     resolution is how many slides you want for the graph. Higher numbers are more laggy.
     """
     #Variable set up
@@ -141,7 +141,7 @@ def WaterLevelCubeGraph(length = 5, width = 5, height = 5, density = 0.5, resolu
 
 def GenerateBoatGraph(length, width, height, canoe_type):
     """ 
-    An interactive graph with a slider for weight. Shows where the equilibrium of the boat is depending on weight, 
+    An interactive graph with a slider for weight. Shows where the equilibrium of the boat is depending on weight, \\
     along with a side view of said boat with a line at equilibrium level.
     """
     #variable set up
@@ -180,10 +180,6 @@ def GenerateBoatGraph(length, width, height, canoe_type):
     sideTrace = scatter(xLine, zLine, "#141414")
     massLevelTrace = scatter(massData, waterLevelData, "#141414")
     massLevelInteractiveTrace = scatter([maxWeight,maxWeight], [0, waterLevelData[graphResolution-1]], "#1991df")
-
-    """
-    MAKE SUBGRAPH ON THE SIDE THAT SHOWS THE MASS vs WaterHeight
-    """
 
     #Change the list order for traces to change render order
     fig = make_subplots(

@@ -1,13 +1,11 @@
 import plotly.graph_objects as go
-import numpy as np #Might need this later
 import scripts.BezierCurve as bc
 
-from ipywidgets import interact, fixed, interact_manual 
+from ipywidgets import interact 
 import ipywidgets as widgets
-from IPython.display import display
     
 def CurveGraph():
-    """ Displays the 3 point Bezier Curve graph
+    """ Displays the 3 point Bezier Curve graph\\
     There are also widgets available for the user.
     """
     ##DATA PREP WORK
@@ -78,7 +76,7 @@ def CurveGraph():
         return fig
 
 def GetCurvePlotWidgets():
-    """ Returns the widgets needed for the Curve Plot
+    """ Returns the widgets needed for the Curve Plot\\
     An Oranization method to help declutter
     """
     tStepsize = 1/32

@@ -1,5 +1,5 @@
 def CurvePoint(points, t):
-    """ Takes in points and a time t from 0 to 1, outputs a vector in the same dimension as the individual points.
+    """ Takes in points and a time t from 0 to 1, outputs a vector in the same dimension as the individual points.\\
     points = [[P0],[P1],...[P(n-1)]]
     """
     n = len(points)

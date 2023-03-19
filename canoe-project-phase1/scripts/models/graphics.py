@@ -2,7 +2,7 @@ import numpy as np
 import plotly.graph_objects as go
 
 def GetArrow(x, y, direction, magnitude, arrowSize, arrowAngle = 0.7):
-    """ returns the polygon points for the arrow
+    """ returns the polygon points for the arrow\\
     takes and x and y origin, direction [x0,y0], magnitude, and arrow size
     """
     normalizedD = np.multiply(direction , 1/np.sqrt(direction[0]**2 + direction[1]**2))
@@ -24,8 +24,8 @@ def Rotate(vector, theta):
 
 def GetTrace(x, y, direction, magnitude, arrowSize, arrowAngle = 0.7):
     """
-    Gets the scatter plot trace of the arrow. Takes and x y position of origin, direction (doesnt need to be normalized)
-    an arrow size, and arrow angle in radians the angle from left to right of the point /\
+    Gets the scatter plot trace of the arrow. Takes and x y position of origin, direction (doesnt need to be normalized)\\
+    an arrow size, and arrow angle in radians the angle from left to right of the point
     """
     X , Y = GetArrow(x,y, direction, magnitude, arrowSize, arrowAngle)
     scatter_Arrow = go.Scatter(

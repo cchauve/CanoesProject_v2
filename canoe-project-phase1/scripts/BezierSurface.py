@@ -1,13 +1,13 @@
-from math import sqrt, isnan
 import numpy as np
 
 """
 This script is for generating the surface points of the bezier surface.
 """
-"""
-    NEED UPDATED COMMENTS!!
-"""
 def GetSurface(p, u, v, n):
+    """
+    Creates a Bezier 3d surface using defined points\\
+    and the tangents at those points.\\
+    """
     P = np.array(p)
     U = np.array(u)
     V = np.array(v)
@@ -72,19 +72,16 @@ def GetSurface(p, u, v, n):
               
     return XX, YY, ZZ
     
-
-"""
-Takes in points A,B,C,D
-and a interpolation value t in [0,1] range.
-
-Outputs a point in the same dimension
-"""
 def BCurve(A,B,C,D, t):
-    
-    A0 = np.multiply(A, Bweights(1,t))
-    B0 = np.multiply(B, Bweights(2,t))
-    C0 = np.multiply(C, Bweights(3,t))
-    D0 = np.multiply(D, Bweights(4,t))
+    """
+    Takes in points A,B,C,D\\
+    and a interpolation value t in [0,1] range.\\\\
+    Outputs a point in the same dimension
+    """
+    A0 = np.multiply(A, -1*t**3 + 3*t**2 - 3*t + 1)
+    B0 = np.multiply(B,  3*t**3 - 6*t**2 + 3*t)
+    C0 = np.multiply(C, -3*t**3 + 3*t**2)
+    D0 = np.multiply(D,  1*t**3)
     return A0 + B0 + C0 + D0 #arrays can add onto eachother nicely.
 
 def BSurf(M, t, s):
@@ -99,14 +96,15 @@ def Bweights(weightNumber, t):
     if (weightNumber == 3): return -3*t**3 + 3*t**2
     return                          1*t**3
 
-"""
-A linear interpolation between A and B
-using the interpolation value t in [0,1] range.
 
-Outputs a point in the same dimension
-TECHNICALLY NOT NEEDED, MIGHT REMOVE.
-"""
 def Lerp(A, B, t):
+    """
+    A linear interpolation between A and B\\
+    using the interpolation value t in [0,1] range.\\\\
+
+    Outputs a point in the same dimension\\
+    TECHNICALLY NOT NEEDED, MIGHT REMOVE.
+    """
     A0 = np.multiply(A, -t + 1)
     B0 = np.multiply(B,  t)
     return A0 + B0

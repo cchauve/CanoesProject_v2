@@ -8,15 +8,15 @@ For handling all the inputs and outputs of the simple cube model
 
 def CalcEquilibrium(height, density, waterDensity = GLOBAL_WaterDensity):
     """
-    Takes a height, density of object, waterDensity, and gravity to calculate the equilibrium.
+    Takes a height, density of object, waterDensity, and gravity to calculate the equilibrium.\\
     Length and depth of object arent neccesary and get cancelled out.
     """
     return height*density / waterDensity
     
 def CalcBouyancy(length, depth, height, waterLevel, waterDensity = GLOBAL_WaterDensity, gravity = GLOBAL_Gravity):
     """
-    Calculates the current bouyancy force given the current length, depth, height, waterLevel.
-    WaterDensity and gravity have a constant global value unless told otherwise. Still trying to find 
+    Calculates the current bouyancy force given the current length, depth, height, waterLevel.\\
+    WaterDensity and gravity have a constant global value unless told otherwise. Still trying to find \\
     a nice way around it.
     """
     #max and min to clamp waterLevel to be no less than 0, and no bigger than height. 
@@ -29,9 +29,9 @@ def CalcWeight(length, depth, height, density, gravity = GLOBAL_Gravity):
     return length * depth * height * density * gravity
 
 
-"""
-Graphing tools are past this point
-"""
+###                            ###
+### G R A P H I N G  T O O L S ###
+###                            ###
 
 def GetWaterDiagram(length, waterLevel):
     """
@@ -51,7 +51,7 @@ def GetCubeDiagram(length, height, waterLevel):
 
 def GetWaterTrace(length, waterLevel):
     """
-    The graph for our water, including the cube thats under it. 
+    The graph for our water, including the cube thats under it.\\
     Takes the length of the 
     """
     X , Y = GetWaterDiagram(length, waterLevel)
