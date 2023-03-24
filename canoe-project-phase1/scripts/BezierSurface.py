@@ -95,17 +95,4 @@ def Bweights(weightNumber, t):
     if (weightNumber == 2): return  3*t**3 - 6*t**2 + 3*t
     if (weightNumber == 3): return -3*t**3 + 3*t**2
     return                          1*t**3
-
-
-def Lerp(A, B, t):
-    """
-    A linear interpolation between A and B\\
-    using the interpolation value t in [0,1] range.\\\\
-
-    Outputs a point in the same dimension\\
-    TECHNICALLY NOT NEEDED, MIGHT REMOVE.
-    """
-    A0 = np.multiply(A, -t + 1)
-    B0 = np.multiply(B,  t)
-    return A0 + B0
     

@@ -44,7 +44,7 @@ def CanoeGraph(length, width, height, canoe_type):
     Will display the canoe type with the respective properties.
     """
     f2str = lambda x:  "{:.4f}".format(x)
-    titleStr = "Length: " + f2str(length) + "(m)\twidth: " + f2str(width) + "(m)\theight: " + f2str(height) +"(m)" 
+    titleStr = "Length: " + f2str(length) + "(m)\tWidth: " + f2str(width) + "(m)\tHeight: " + f2str(height) +"(m)" 
     color = "#734e32"
         
     x, y, z, dx, dy, dz = Canoe_To_List(length, width, height, canoe_type, 4)
@@ -61,7 +61,7 @@ def CanoeGraph(length, width, height, canoe_type):
 
     fig = go.Figure(data=[normal_meshTrace, mirror_meshTrace])
     axisDictionary = dict(title = '', showbackground = False, showgrid = False, showline = False, showticklabels = False)
-    sceneDictionary = dict( aspectmode= "data", xaxis = axisDictionary, yaxis = axisDictionary, zaxis = axisDictionary)
+    sceneDictionary = dict(aspectmode= "data", xaxis = axisDictionary, yaxis = axisDictionary, zaxis = axisDictionary)
     fig.update_layout(scene = sceneDictionary, title = titleStr,  width = 1280, height = 720)
     fig.show()
     

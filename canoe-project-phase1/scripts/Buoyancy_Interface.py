@@ -180,15 +180,19 @@ def GenerateBoatGraph(length, width, height, canoe_type):
     sideTrace = scatter(xLine, zLine, "#141414")
     massLevelTrace = scatter(massData, waterLevelData, "#141414")
     massLevelInteractiveTrace = scatter([maxWeight,maxWeight], [0, waterLevelData[graphResolution-1]], "#1991df")
+    
 
     #Change the list order for traces to change render order
     fig = make_subplots(
         rows = 2, cols = 1,
-        subplot_titles=("Graphic", "Mass versus Waterlevel")
+        subplot_titles=("Graphic", "Mass versus Water Level")
     )
-    fig.update_layout(width = 1280, height = 720, title_text="bouyancy graph")
-    fig.update_xaxes(range = xRange, row = 1, col = 1)
-    fig.update_yaxes(range = yRange, row = 1, col = 1, scaleanchor ="x", scaleratio = 1)
+    fig.update_layout(width = 1280, height = 720, title_text="Bouyancy Graph", showlegend = False)
+    fig.update_xaxes(range = xRange, row = 1, col = 1, showgrid = False, zeroline = False)
+    fig.update_yaxes(range = yRange, row = 1, col = 1, showgrid = False, zeroline = False, scaleanchor ="x", scaleratio = 1)
+
+    fig.update_xaxes(row = 2, col = 1, title_text = "Mass(kg)")
+    fig.update_yaxes(row = 2, col = 1, title_text = "Water Level(m)")
 
     fig.add_trace(sideTrace,  row = 1, col = 1)                 #data 0
     fig.add_trace(levelTrace, row = 1, col = 1)                 #data 1
@@ -208,7 +212,7 @@ def GenerateBoatGraph(length, width, height, canoe_type):
             fig.data[3].y = [0, waterLevel]
             
             fig.update_layout(
-                title = "Bottom of the Canoe to Water Level(m): " + "{:.4f}".format(waterLevel) + "\t" + titleStr
+                title = "Canoe Bottom to Water Level(m): " + "{:.4f}".format(waterLevel) + "\t" + titleStr
             )
         return fig
     return None

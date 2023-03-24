@@ -9,7 +9,7 @@ def CurveGraph():
     There are also widgets available for the user.
     """
     ##DATA PREP WORK
-    resolution = 32
+    resolution = 25
     xPoints = [0, 2.5, 5]
     yPoints = [0, 2.5, 5]
     points  = [[xPoints[0],yPoints[0]],[xPoints[1],yPoints[1]],[xPoints[2],yPoints[2]]]
@@ -46,7 +46,7 @@ def CurveGraph():
     fig.add_trace(curvePlot)
     fig.add_trace(pointPlot)
     fig.add_trace(interpolatedPlot)
-    fig.update_layout(width = 700, height = 500, plot_bgcolor = 'rgba(0,0,0,0)')
+    fig.update_layout(width = 1280, height = 720, plot_bgcolor = 'rgba(0,0,0,0)')
     standard = dict(range = [-0.5,5.5], zeroline = False, showgrid = False, visible = False, scaleratio = 1)
     fig.update_xaxes(standard)
     fig.update_yaxes(standard, scaleanchor = "x", )
